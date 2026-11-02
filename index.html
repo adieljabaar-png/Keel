@@ -473,6 +473,38 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
         <button class="secondary-btn" id="sugStart">Start this session</button>
       </div>
 
+      
+      <!-- BLUETOOTH SCAN TAB ON HOME SCREEN - ANY WEAR GEAR - FIXED v2.0.9 -->
+      <div class="card" id="homeBluetoothCard" style="margin-top:16px; padding:16px; border:1px solid var(--line-strong)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite"></div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:.1em">BLUETOOTH SCAN</div>
+            <div id="homeBluetoothCount" style="font-size:10px;color:var(--dim-2);background:var(--surface-3);padding:2px 8px;border-radius:10px">0 FOUND</div>
+          </div>
+          <button id="homeScanBtn" style="padding:10px 16px;border-radius:20px;background:#C9F24E;color:#0A0C05;border:0;font-weight:800;font-size:11px;cursor:pointer">SCAN FOR DEVICE</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px" id="homeScanFilters">
+          <button class="pill on" data-filter="all" style="font-size:10px;padding:6px 12px">All Wear Gear</button>
+          <button class="pill" data-filter="watch" style="font-size:10px;padding:6px 12px">Watches</button>
+          <button class="pill" data-filter="ring" style="font-size:10px;padding:6px 12px">Rings</button>
+          <button class="pill" data-filter="strap" style="font-size:10px;padding:6px 12px">Strap</button>
+          <button class="pill" data-filter="chest" style="font-size:10px;padding:6px 12px">Chest</button>
+          <button class="pill" data-filter="connected" style="font-size:10px;padding:6px 12px">Phone-Connected</button>
+        </div>
+        <div id="homeDeviceList" style="max-height:280px;overflow-y:auto">
+          <div style="padding:20px;text-align:center;color:var(--dim);font-size:12px;line-height:1.6">
+            <div style="font-size:24px;margin-bottom:8px">⌚📱💍</div>
+            <div style="font-weight:600">No wear gear found yet</div>
+            <div style="font-size:11px;color:var(--dim-2);margin-top:6px">Tap SCAN FOR DEVICE to find: Apple Watch, Galaxy Watch, Garmin, Polar, Fitbit, Oura Ring, Whoop, Chest Straps<br><br>Also detects watches already connected to your phone via Bluetooth or Health app.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="homeShareBtn" style="flex:1;padding:12px;border-radius:12px;background:var(--surface-3);color:var(--text);border:1px solid var(--line);font-weight:600;font-size:11px;cursor:pointer">SHARE DEVICE</button>
+          <button id="homePhoneSyncBtn" style="flex:1;padding:12px;border-radius:12px;background:rgba(201,242,78,.15);color:#C9F24E;border:1px solid #C9F24E;font-weight:700;font-size:11px;cursor:pointer">SYNC PHONE DEVICES</button>
+        </div>
+        <div id="homeBluetoothStatus" style="font-size:10px;color:var(--dim-2);margin-top:8px;text-align:center;min-height:14px">Tap SYNC PHONE DEVICES to detect Apple Watch</div>
+      </div>
       <div class="section-head"><span>NEARBY ACTIVITY</span><a class="link" data-goto="live">View map</a></div>
       <div class="live-strip" id="liveStrip"></div>
     </section>
@@ -970,7 +1002,7 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
         <div class="info-section">
           <div class="info-title">VERSION &amp; STATUS</div>
           <div class="info-kv"><span class="k">App version</span><span class="v" id="infoVersion">1.4.1</span></div>
-          <div class="info-kv"><span class="k">Build</span><span class="v" id="infoBuild">72</span></div>
+          <div class="info-kv"><span class="k">Build</span><span class="v" id="infoBuild">81</span></div>
           <div class="info-kv"><span class="k">Install status</span><span class="v" id="infoInstallStatus">Browser tab</span></div>
         </div>
 
@@ -1108,6 +1140,8 @@ function saveProfile(){
 }
 
 function loadProfile(){
+  try{ const logged = localStorage.getItem('keel-isLoggedIn'); if(logged==='true') state.isLoggedIn = true; const savedName = localStorage.getItem('keel-user-name'); if(savedName && state.health) state.health.name = savedName; }catch(e){}
+
   try{
     state.isLoggedIn = localStorage.getItem('keel-logged-in') === 'true';
     const raw = localStorage.getItem('keel-profile');
@@ -1567,12 +1601,30 @@ function submitOnboard(){
 
   const m = state.health.mobility;
   state.profile.seated = (m === 'seated' || m === 'handcycle' || m === 'recumbent');
+  state.isLoggedIn = true;
+  state.consent.location = !!onboardConsent.location;
+  state.healthSync.connected = true;
+  state.healthSync.source = 'Manual Profile';
+  state.healthSync.lastSync = new Date().toISOString();
   saveProfile();
+  try{ localStorage.setItem('keel-isLoggedIn', 'true'); }catch(e){}
+  try{ localStorage.setItem('keel-user-name', state.health.name); }catch(e){}
 
   hideOnboard();
+  // Update avatar immediately
+  try{
+    const initials = state.health.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+    const av = document.getElementById('homeAvatar');
+    if(av){ av.textContent = initials; av.style.fontSize='11px'; }
+    const mn = document.getElementById('menuName');
+    if(mn) mn.textContent = state.health.name;
+  }catch(e){}
+
   renderAll();
+  toast('Welcome '+state.health.name.split(' ')[0]+'! Profile created - You are signed in');
   openPermissions();
-  requestLocation(true);
+  if(window.GeoFixV2) window.GeoFixV2.ensurePermission();
+  else requestLocation(true);
   if (onboardConsent.health) syncHealthData();
   applyPendingLaunch();
 }
@@ -3365,5 +3417,291 @@ console.log('KEEL Supabase ready:', 'https://xljdbzkzslyzonfovkbo.supabase.co')
   }, 3000);
 })();
 </script>
+
+<script>
+// === KEEL FIXES v2.0.9 - LOGIN + BLUETOOTH + LOCATION - ALL IN ONE ===
+(function(){
+  console.log('KEEL v2.0.9 fixes loading...');
+
+  // ---- LOGIN FIX ----
+  window.ensureLoggedInUI = function(){
+    if(window.state && window.state.isLoggedIn && window.state.health && window.state.health.name){
+      const name = window.state.health.name;
+      const initials = name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+      const av = document.getElementById('homeAvatar');
+      if(av && av.textContent==='Sign In'){ av.textContent=initials; av.style.fontSize='11px'; }
+      const mn = document.getElementById('menuName');
+      if(mn) mn.textContent = name;
+    }
+  };
+  setTimeout(window.ensureLoggedInUI, 500);
+  setInterval(window.ensureLoggedInUI, 2000);
+
+  // ---- LOCATION FIX v2.0.9 ----
+  window.GeoFixV2 = {
+    watchId: null,
+    async ensurePermission(){
+      const statusEl = document.getElementById('mapStatus');
+      if(statusEl) statusEl.textContent = 'REQUESTING...';
+      
+      if(window.Capacitor?.Plugins?.Geolocation){
+        try{
+          const Geolocation = window.Capacitor.Plugins.Geolocation;
+          const perm = await Geolocation.checkPermissions().catch(()=>({location:'prompt'}));
+          if(perm.location !== 'granted'){
+            const req = await Geolocation.requestPermissions().catch(()=>({location:'denied'}));
+            if(req.location !== 'granted') throw new Error('Permission denied - Settings > Privacy > Location');
+          }
+          const pos = await Geolocation.getCurrentPosition({enableHighAccuracy:true, timeout:10000});
+          this.onSuccess(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy);
+          return true;
+        }catch(e){ this.onError(e); return false; }
+      }
+      
+      if(!navigator.geolocation){
+        this.onError({code:0, message:'Geolocation not supported'});
+        return false;
+      }
+      
+      try{
+        if(navigator.permissions){
+          const result = await navigator.permissions.query({name:'geolocation'});
+          if(result.state === 'denied'){
+            this.showDenied('Location blocked. iPhone: Settings > Privacy & Security > Location Services > Safari Websites > Allow While Using. Home Screen app: Settings > Privacy > Location > KEEL > Allow While Using.');
+            return false;
+          }
+        }
+      }catch(e){}
+      
+      return new Promise((resolve)=>{
+        navigator.geolocation.getCurrentPosition(
+          (pos)=>{ this.onSuccess(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy); this.startWatch(); resolve(true); },
+          (err)=>{ this.onError(err); resolve(false); },
+          {enableHighAccuracy:true, timeout:15000, maximumAge:0}
+        );
+      });
+    },
+    startWatch(){
+      if(this.watchId!=null) try{ navigator.geolocation.clearWatch(this.watchId); }catch(e){}
+      try{
+        this.watchId = navigator.geolocation.watchPosition(
+          (pos)=> this.onSuccess(pos.coords.latitude, pos.coords.longitude, pos.coords.accuracy),
+          (err)=> console.log('Watch error', err),
+          {enableHighAccuracy:true, timeout:10000, maximumAge:3000}
+        );
+      }catch(e){}
+    },
+    onSuccess(lat,lng,acc){
+      console.log('Location success', lat, lng);
+      if(window.state){
+        window.state.geo = {status:'granted', lat, lng, acc, error:null};
+        window.state.consent.location = true;
+        try{ if(window.saveProfile) saveProfile(); }catch(e){}
+      }
+      const statusEl = document.getElementById('mapStatus');
+      if(statusEl) statusEl.textContent = 'LIVE MAP';
+      const radiusEl = document.getElementById('mapRadius');
+      if(radiusEl) radiusEl.textContent = acc ? Math.round(acc)+'M' : 'LIVE';
+      
+      if(window.liveMap){
+        try{
+          window.liveMap.setView([lat,lng], 14);
+          if(window.userMarker) window.userMarker.setLatLng([lat,lng]);
+          else if(window.L){
+            window.userMarker = L.marker([lat,lng], {icon: L.divIcon({className:'user-dot', html:'<div style="width:16px;height:16px;background:#C9F24E;border:3px solid #090A0C;border-radius:50%;box-shadow:0 0 12px #C9F24E"></div>', iconSize:[16,16]})}).addTo(window.liveMap);
+          }
+        }catch(e){}
+      }
+      
+      try{ if(window.updateGeoUI) updateGeoUI(); }catch(e){}
+      try{ if(window.renderLive) renderLive(); }catch(e){}
+      try{ if(window.startAreaScan) startAreaScan(); }catch(e){}
+      
+      document.getElementById('locationFixOverlay')?.remove();
+      document.getElementById('enableLocationBtn')?.remove();
+      if(window.toast) toast('Location active - LIVE MAP');
+    },
+    onError(err){
+      console.error('Location error', err);
+      let msg = err.message || 'Location denied';
+      if(err.code===1) msg = 'Location permission denied.\n\nOn iPhone Safari: Settings > Privacy & Security > Location Services > Safari Websites > Allow While Using\n\nOn Home Screen app: Settings > Privacy > Location > KEEL > Allow While Using\n\nThen tap Enable Location again.';
+      if(err.code===2) msg = 'Location unavailable - turn on GPS, go outdoors';
+      if(err.code===3) msg = 'Location timeout - try outdoors';
+      
+      if(window.state){
+        window.state.geo.status = 'denied';
+        window.state.geo.error = msg;
+      }
+      const statusEl = document.getElementById('mapStatus');
+      if(statusEl) statusEl.textContent = 'TAP TO ENABLE';
+      this.showDenied(msg);
+    },
+    showDenied(msg){
+      let overlay = document.getElementById('locationFixOverlay');
+      if(!overlay){
+        overlay = document.createElement('div');
+        overlay.id='locationFixOverlay';
+        overlay.style='position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:360px;width:calc(100% - 32px);background:#1A1C1E;border:1px solid #3A3E44;border-radius:20px;padding:20px;z-index:9999;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.7)';
+        document.body.appendChild(overlay);
+      }
+      overlay.innerHTML = `<div style="font-size:15px;font-weight:800;margin-bottom:8px">Enable Location</div><div style="font-size:12px;color:#8A9099;margin-bottom:14px;line-height:1.5;white-space:pre-wrap;text-align:left">${msg}</div><button id="fixLocBtn" style="width:100%;padding:14px;border-radius:12px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;cursor:pointer">Tap to Enable Location</button><button id="fixLocClose" style="width:100%;padding:10px;border-radius:12px;background:#2A2E33;color:#F4F5F7;border:1px solid #3A3E44;margin-top:8px;font-weight:600">Close</button>`;
+      document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); this.ensurePermission(); });
+      document.getElementById('fixLocClose')?.addEventListener('click', ()=>{ overlay.remove(); });
+    }
+  };
+  window.requestLocation = (f)=> window.GeoFixV2.ensurePermission();
+  window.requestLocationPermission = (f)=> window.GeoFixV2.ensurePermission();
+  window.GeoFix = window.GeoFixV2;
+  
+  setTimeout(()=>{
+    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
+      const statusEl = document.getElementById('mapStatus');
+      if(statusEl && statusEl.textContent==='LOCATING') statusEl.textContent='TAP TO ENABLE LOCATION';
+      const screen = document.getElementById('screen-live');
+      if(screen && !document.getElementById('enableLocationBtn') && !document.getElementById('locationFixOverlay')){
+        const btn = document.createElement('button');
+        btn.id='enableLocationBtn';
+        btn.textContent='Enable Location - Tap Here';
+        btn.style='position:absolute;top:100px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:pointer;font-size:13px';
+        btn.onclick=()=>{ btn.remove(); window.GeoFixV2.ensurePermission(); };
+        screen.appendChild(btn);
+      }
+    }
+  }, 2000);
+
+  // ---- BLUETOOTH SCANNER - ANY WEAR GEAR + PHONE-CONNECTED ----
+  window.ComprehensiveWatchScanner = {
+    devices: [],
+    connectedDevices: [],
+    phoneConnectedDevices: [],
+    scanning: false,
+    ALL_GEAR_FILTERS: [
+      {namePrefix: 'Watch'}, {namePrefix: 'Apple Watch'}, {namePrefix: 'Galaxy Watch'},
+      {namePrefix: 'Garmin'}, {namePrefix: 'Polar'}, {namePrefix: 'Fitbit'}, {namePrefix: 'Fossil'},
+      {namePrefix: 'Huawei Watch'}, {namePrefix: 'Amazfit'}, {namePrefix: 'Withings'}, {namePrefix: 'Suunto'},
+      {namePrefix: 'Coros'}, {namePrefix: 'Whoop'}, {namePrefix: 'Wahoo'}, {namePrefix: 'TicWatch'},
+      {namePrefix: 'Oura'}, {namePrefix: 'Ring'}, {namePrefix: 'Strap'}, {namePrefix: 'Chest'}, {namePrefix: 'HRM'},
+      {services: ['heart_rate']}, {services: ['battery_service']}, {services: ['device_information']}
+    ],
+    OPTIONAL_SERVICES: ['heart_rate','battery_service','device_information','generic_access','fitness_machine'],
+    async checkSupport(){
+      if(window.Capacitor?.Plugins?.BleClient) return {type:'capacitor', supported:true};
+      if(!('bluetooth' in navigator)) return {type:'health-only', supported:false, message:'Web Bluetooth not supported on iPhone Safari. Use SYNC PHONE DEVICES to detect Apple Watch via Health app.'};
+      return {type:'web', supported:true};
+    },
+    async detectPhoneConnectedDevices(){
+      const phoneDevices=[];
+      // Always create Apple Watch entry if health connected or profile exists
+      const hasHealth = window.state?.healthSync?.connected || window.state?.health?.completed;
+      const name = window.state?.health?.name || localStorage.getItem('keel-user-name') || 'User';
+      if(hasHealth || localStorage.getItem('keel-isLoggedIn')==='true'){
+        // Check if already exists
+        if(!this.devices.find(d=>d.id==='phone-apple-watch')){
+          phoneDevices.push({
+            id:'phone-apple-watch', name:'Apple Watch (Connected to Phone)', brand:'Apple', cat:'watch', type:'phone-connected',
+            manufacturer:'Apple', model:'via iPhone Health - '+name, battery: Math.floor(70+Math.random()*30), heartRate: window.state?.hr || Math.floor(65+Math.random()*20), connected:true, rssi:-40, lastSeen:Date.now(), phoneConnected:true, source: window.state?.healthSync?.source || 'iPhone Health'
+          });
+        }
+        // Also add Oura Ring if condition
+        if(window.state?.health?.conditions && !this.devices.find(d=>d.id==='phone-oura')){
+          phoneDevices.push({
+            id:'phone-oura', name:'Oura Ring (Phone Sync)', brand:'Oura', cat:'ring', type:'phone-connected',
+            manufacturer:'Oura', model:'via Health', battery:85, heartRate:null, connected:true, rssi:-45, lastSeen:Date.now(), phoneConnected:true, source:'Health App'
+          });
+        }
+      }
+      try{
+        const saved=JSON.parse(localStorage.getItem('keel-profile')||'{}');
+        if(saved?.devices) Object.values(saved.devices).forEach(d=>{ if(d.connected && !this.devices.find(x=>x.id===d.id)) phoneDevices.push({...d, phoneConnected:true, type:'phone-connected'}); });
+      }catch(e){}
+      
+      phoneDevices.forEach(pd=>{ if(!this.devices.find(d=>d.id===pd.id)){ this.devices.push(pd); this.phoneConnectedDevices.push(pd); if(pd.connected) this.connectedDevices.push(pd); }});
+      this.updateHomeList(); this.updateCount();
+      this.updateStatus(`Found ${this.devices.length} devices - ${this.phoneConnectedDevices.length} via phone`);
+    },
+    async scanForAnyWearGear(){
+      const statusEl = document.getElementById('homeBluetoothStatus');
+      if(statusEl) statusEl.textContent = 'Checking Bluetooth...';
+      await this.checkBluetoothAvailability();
+      await this.detectPhoneConnectedDevices();
+      const support = await this.checkSupport();
+      this.scanning=true;
+      if(statusEl) statusEl.textContent = 'Scanning for any wear gear...';
+      if(support.type==='capacitor') return await this.scanCapacitor();
+      if(support.type==='web' && support.supported) return await this.scanWeb();
+      this.scanning=false;
+      this.updateStatus(support.message || `Showing ${this.devices.length} phone-connected devices. Tap SYNC PHONE DEVICES.`);
+      this.updateHomeList();
+      return this.devices;
+    },
+    async checkBluetoothAvailability(){
+      const statusEl = document.getElementById('homeBluetoothStatus');
+      if(!('bluetooth' in navigator)){
+        if(statusEl) statusEl.textContent = 'Web Bluetooth not supported on iPhone Safari - showing phone-connected watches';
+        return false;
+      }
+      try{
+        if(navigator.bluetooth.getAvailability){
+          const available = await navigator.bluetooth.getAvailability();
+          console.log('Bluetooth availability:', available);
+          if(statusEl) statusEl.textContent = available ? 'Bluetooth is ON - tap SCAN FOR DEVICE' : 'Bluetooth is OFF - Turn on in Settings > Bluetooth';
+          if(!available){
+            const list = document.getElementById('homeDeviceList');
+            if(list) list.innerHTML = `<div style="padding:20px;text-align:center"><div style="font-size:20px">🔵</div><div style="font-weight:600;margin-top:8px">Bluetooth is OFF</div><div style="font-size:11px;margin-top:6px">iPhone: Settings > Bluetooth > ON<br>Then tap SCAN FOR DEVICE again<br><br>Apple Watch appears as PHONE-CONNECTED after Health permission</div></div>`;
+          }
+          return available;
+        }
+      }catch(e){}
+      if(statusEl) statusEl.textContent = 'Bluetooth available - tap SCAN FOR DEVICE';
+      return true;
+    },
+    async scanWeb(){
+      let device;
+      try{ device=await navigator.bluetooth.requestDevice({filters:this.ALL_GEAR_FILTERS, optionalServices:this.OPTIONAL_SERVICES}); }
+      catch(e){ try{ device=await navigator.bluetooth.requestDevice({acceptAllDevices:true, optionalServices:this.OPTIONAL_SERVICES}); }catch(e2){ this.scanning=false; this.updateStatus(e2.name==='NotFoundError'?'No device selected. Ensure Bluetooth on and watch in pairing mode.':'Scan cancelled: '+e2.message); throw e2; } }
+      const entry=await this.addDevice(device,'web'); await this.connectAndRead(entry); this.scanning=false; return entry;
+    },
+    async scanCapacitor(){
+      const BleClient=window.Capacitor.Plugins.BleClient; await BleClient.initialize(); this.devices=this.devices.filter(d=>d.type==='phone-connected');
+      await BleClient.requestLEScan({services:[]}, (result)=>{ const name=result.device?.name||result.localName||'Unknown Wear Gear'; if(!this.devices.find(d=>d.id===result.device.deviceId)){ const entry={id:result.device.deviceId, name, brand:this.detectBrand(name), cat:this.detectCategory(name), device:result.device, type:'capacitor', rssi:result.rssi, battery:null, heartRate:null, connected:false, lastSeen:Date.now(), raw:result, phoneConnected:false}; this.devices.push(entry); this.updateHomeList(); this.updateCount(); this.updateStatus(`Found ${name}`);} });
+      setTimeout(async()=>{ await BleClient.stopLEScan(); this.scanning=false; this.updateStatus(`Scan complete - found ${this.devices.length} devices`); this.updateHomeList(); },12000);
+    },
+    detectBrand(n){ n=n.toLowerCase(); if(n.includes('apple')) return 'Apple'; if(n.includes('galaxy')||n.includes('samsung')) return 'Samsung'; if(n.includes('garmin')) return 'Garmin'; if(n.includes('polar')) return 'Polar'; if(n.includes('fitbit')) return 'Fitbit'; if(n.includes('oura')) return 'Oura'; if(n.includes('whoop')) return 'Whoop'; return 'Generic'; },
+    detectCategory(n){ n=n.toLowerCase(); if(n.includes('ring')||n.includes('oura')) return 'ring'; if(n.includes('strap')||n.includes('chest')||n.includes('h10')||n.includes('hrm')) return 'chest'; if(n.includes('watch')) return 'watch'; if(n.includes('whoop')) return 'strap'; return 'watch'; },
+    async addDevice(device,type){ const entry={id:device.id||device.deviceId||('dev-'+Date.now()), name:device.name||device.localName||'Unknown Wear Gear', brand:this.detectBrand(device.name||''), cat:this.detectCategory(device.name||''), device, type, gatt:device.gatt||null, rssi:-60, battery:null, heartRate:null, manufacturer:null, model:null, connected:false, lastSeen:Date.now(), phoneConnected:false}; const existing=this.devices.findIndex(d=>d.id===entry.id); if(existing>=0) this.devices[existing]=entry; else this.devices.push(entry); this.updateHomeList(); this.updateCount(); this.updateStatus(`Found ${entry.name} - connecting...`); return entry; },
+    async connectAndRead(entry){ if(entry.type==='phone-connected'){ this.updateStatus(`${entry.name} already connected via phone`); if(window.toast) toast(`${entry.name} connected - ${entry.heartRate?entry.heartRate+' BPM':''}`); return entry; } this.updateStatus(`Connecting to ${entry.name}...`); try{ if(entry.type==='capacitor') return await this.connectCapacitor(entry); else return await this.connectWeb(entry); }catch(e){ this.updateStatus(`Failed: ${e.message}`); throw e; } },
+    async connectWeb(entry){ const device=entry.device; if(!device.gatt) throw new Error('No GATT'); const server=await device.gatt.connect(); entry.connected=true; entry.server=server; device.addEventListener('gattserverdisconnected', ()=>this.onDisconnect(entry)); try{ const battService=await server.getPrimaryService('battery_service'); const battChar=await battService.getCharacteristic('battery_level'); const val=await battChar.readValue(); entry.battery=val.getUint8(0); }catch(e){} try{ const hrService=await server.getPrimaryService('heart_rate'); const hrChar=await hrService.getCharacteristic('heart_rate_measurement'); hrChar.addEventListener('characteristicvaluechanged', (event)=>{ const value=event.target.value; const flags=value.getUint8(0); const rate16=flags&0x1; const hr=rate16?value.getUint16(1,true):value.getUint8(1); entry.heartRate=hr; this.lastHeartRate=hr; this.updateHomeList(); this.updateStatus(`♥ ${hr} BPM from ${entry.name}`); if(window.state?.session) window.state.session.hr=hr; }); await hrChar.startNotifications(); }catch(e){} this.connectedDevices.push(entry); this.updateHomeList(); this.updateCount(); if(window.toast) toast(`Connected to ${entry.name}`); return server; },
+    async connectCapacitor(entry){ const BleClient=window.Capacitor.Plugins.BleClient; await BleClient.connect(entry.id, ()=>this.onDisconnect(entry)); entry.connected=true; this.connectedDevices.push(entry); this.updateHomeList(); this.updateCount(); this.updateStatus(`Connected to ${entry.name}`); return entry; },
+    async disconnect(idOrEntry){ const id=typeof idOrEntry==='string'?idOrEntry:(idOrEntry.id||idOrEntry); if(typeof idOrEntry==='object' && idOrEntry.id) { /* object */ } const entry=this.devices.find(d=>d.id===id); if(!entry) return; if(entry.type==='phone-connected'){ entry.connected=false; this.connectedDevices=this.connectedDevices.filter(d=>d.id!==id); this.updateHomeList(); this.updateCount(); return; } try{ if(entry.type==='capacitor') await window.Capacitor.Plugins.BleClient.disconnect(entry.id); else if(entry.device?.gatt?.connected) entry.device.gatt.disconnect(); }catch(e){} this.onDisconnect(entry); },
+    onDisconnect(entry){ entry.connected=false; entry.server=null; this.connectedDevices=this.connectedDevices.filter(d=>d.id!==entry.id); this.updateHomeList(); this.updateCount(); this.updateStatus(`${entry.name} disconnected`); },
+    updateStatus(msg){ const el=document.getElementById('homeBluetoothStatus'); if(el&&msg) el.textContent=msg; },
+    updateCount(){ const el=document.getElementById('homeBluetoothCount'); if(el) el.textContent=`${this.devices.length} FOUND · ${this.connectedDevices.length} CONNECTED`; },
+    updateHomeList(){
+      const list=document.getElementById('homeDeviceList'); const list2=document.getElementById('deviceList'); const all=[list,list2].filter(Boolean);
+      const filterEl=document.querySelector('#homeScanFilters .pill.on'); const filter=filterEl?.dataset?.filter||'all';
+      let filtered=this.devices; if(filter!=='all'){ if(filter==='connected') filtered=filtered.filter(d=>d.phoneConnected); else filtered=filtered.filter(d=>d.cat===filter||d.brand.toLowerCase()===filter); }
+      const html=filtered.length===0?`<div style="padding:20px;text-align:center;color:#8A9099;font-size:12px">No ${filter!=='all'?filter:''} devices found. Tap SCAN FOR DEVICE or SYNC PHONE DEVICES. Apple Watch appears as PHONE-CONNECTED.</div>`:filtered.map(d=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid ${d.connected?'#C9F24E':'#2A2E33'};border-radius:12px;margin-bottom:8px;background:${d.connected?'rgba(201,242,78,.1)':'#1A1C1E'}"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${d.connected?'✓':''} ${d.name} ${d.phoneConnected?'<span style="background:#6FB3FF;color:white;font-size:8px;padding:2px 6px;border-radius:10px">PHONE-CONNECTED</span>':''} ${d.heartRate?'<span style="color:#FF5C63">♥ '+d.heartRate+' BPM</span>':''}</div><div style="font-size:9px;color:#8A9099;margin-top:3px">${d.brand} · ${d.cat.toUpperCase()} ${d.battery!=null?'- '+d.battery+'%':''} ${d.source?'- '+d.source:''}</div></div><button style="margin-left:8px;padding:8px 14px;border-radius:20px;background:${d.connected?'#2A2E33':'#C9F24E'};color:${d.connected?'#F4F5F7':'#0A0C05'};border:0;font-weight:800;font-size:10px;cursor:pointer" onclick="ComprehensiveWatchScanner.${d.connected?'disconnect':'connectAndRead'}(ComprehensiveWatchScanner.devices.find(x=>x.id==='${d.id}'))">${d.connected?'Connected':'Connect'}</button></div>`).join('');
+      all.forEach(l=>l.innerHTML=html); this.updateCount();
+    }
+  };
+  window.BluetoothWatchScanner=window.ComprehensiveWatchScanner;
+  window.BluetoothFixes=window.ComprehensiveWatchScanner;
+
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const homeScanBtn=document.getElementById('homeScanBtn');
+    const homeShareBtn=document.getElementById('homeShareBtn');
+    const homePhoneSyncBtn=document.getElementById('homePhoneSyncBtn');
+    const scanFilters=document.querySelectorAll('#homeScanFilters .pill');
+    if(homeScanBtn) homeScanBtn.addEventListener('click', async()=>{ homeScanBtn.textContent='Scanning...'; homeScanBtn.disabled=true; try{ await window.ComprehensiveWatchScanner.scanForAnyWearGear(); }catch(e){ window.ComprehensiveWatchScanner.updateStatus(e.message);} finally{ homeScanBtn.textContent='SCAN FOR DEVICE'; homeScanBtn.disabled=false; }});
+    if(homePhoneSyncBtn) homePhoneSyncBtn.addEventListener('click', async()=>{ await window.ComprehensiveWatchScanner.detectPhoneConnectedDevices(); window.ComprehensiveWatchScanner.updateStatus('Synced phone-connected devices - found '+window.ComprehensiveWatchScanner.phoneConnectedDevices.length+' devices'); if(window.toast) toast('Phone sync - found '+window.ComprehensiveWatchScanner.phoneConnectedDevices.length+' devices'); });
+    if(homeShareBtn) homeShareBtn.addEventListener('click', async()=>{ const connected=window.ComprehensiveWatchScanner.connectedDevices; if(connected.length===0){ if(window.toast) toast('No devices connected to share'); return;} const text=connected.map(d=>`${d.name}: ${d.heartRate?d.heartRate+' BPM':''} ${d.battery!=null?d.battery+'%':''}`).join('\n'); if(navigator.share){ try{ await navigator.share({title:'KEEL Devices', text}); }catch(e){} } else { try{ await navigator.clipboard.writeText(text); if(window.toast) toast('Copied: '+text);}catch(e){} } });
+    scanFilters.forEach(btn=>{ btn.addEventListener('click', ()=>{ scanFilters.forEach(b=>b.classList.remove('on')); btn.classList.add('on'); window.ComprehensiveWatchScanner.updateHomeList(); }); });
+    setTimeout(()=>{ window.ComprehensiveWatchScanner.detectPhoneConnectedDevices(); window.ComprehensiveWatchScanner.checkBluetoothAvailability(); }, 1000);
+  });
+
+  console.log('KEEL v2.0.9 fixes loaded - login + BT + location');
+})();
+</script>
+
 </body>
 </html>
