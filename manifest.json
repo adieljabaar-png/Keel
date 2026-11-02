@@ -1,33 +1,21 @@
 {
-  "name": "KEEL \u2014 Steady by design",
+  "name": "KEEL — Steady by design",
   "short_name": "KEEL",
-  "description": "Adaptive training companion with real-time Bluetooth health monitoring, live map, and optional Apple Health / Google Fit sync (with explicit permission).",
+  "description": "Adaptive training companion with real-time health monitoring, live map and private health data sync.",
   "start_url": "./#home",
   "scope": "./",
   "id": "keel-app",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui",
-    "browser"
-  ],
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait",
   "background_color": "#090A0C",
   "theme_color": "#090A0C",
   "lang": "en",
   "dir": "ltr",
-  "categories": [
-    "health",
-    "fitness",
-    "lifestyle",
-    "medical"
-  ],
+  "categories": ["health", "fitness", "lifestyle", "medical"],
   "prefer_related_applications": false,
   "launch_handler": {
-    "client_mode": [
-      "navigate-existing",
-      "auto"
-    ]
+    "client_mode": ["navigate-existing", "auto"]
   },
   "icons": [
     {
@@ -62,24 +50,16 @@
       "url": "./#home",
       "description": "Begin an adapted training session",
       "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
+        { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }
       ]
     },
     {
       "name": "Live map",
       "short_name": "Live",
       "url": "./#live",
-      "description": "Open the live map \u2014 KEEL will ask for location access to show nearby public activities",
+      "description": "Open the live map — KEEL will ask for location access to show nearby public activities",
       "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
+        { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }
       ]
     },
     {
@@ -88,35 +68,8 @@
       "url": "./#you",
       "description": "Open your health profile and sync Fitness / Health data",
       "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
+        { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }
       ]
     }
-  ],
-  "permissions": [
-    "geolocation"
-  ],
-  "handle_links": "preferred",
-  "edge_side_panel": {
-    "preferred_width": 440
-  },
-  "bluetooth": {
-    "optional_services": [
-      "heart_rate",
-      "battery_service",
-      "device_information"
-    ]
-  },
-  "screenshots": [],
-  "permissions_policy": {
-    "geolocation": [
-      "self"
-    ],
-    "bluetooth": [
-      "self"
-    ]
-  }
+  ]
 }
