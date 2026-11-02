@@ -391,6 +391,12 @@ select.search-input{appearance:none;background-image:url("data:image/svg+xml;cha
 .info-kv .k{color:var(--dim)}
 .info-kv .v{font-weight:600;text-align:right}
 </style>
+
+<script>
+// Auto-configure Supabase URL from your project
+localStorage.setItem('keel-supabase-url', 'https://xljdbzkzslyzonfovkbo.supabase.co');
+console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co');
+</script>
 </head>
 <body>
 <div class="shell">
@@ -2671,6 +2677,693 @@ function boot(){
 }
 
 boot();
+</script>
+
+<!-- === KEEL FIXES APPLIED === -->
+<script>
+// 1. BLUETOOTH CONNECTION FIXES
+window.BluetoothFixes = {
+  devices: [],
+  scanning: false,
+  async checkSupport(){
+    if (!('bluetooth' in navigator)) throw new Error('Web Bluetooth not supported in this browser. Use Chrome/Edge on Android/Desktop, or KEEL native app.');
+    if (!window.isSecureContext) throw new Error('Bluetooth requires HTTPS.');
+    try { const avail = await navigator.bluetooth.getAvailability(); if(!avail) console.warn('Bluetooth adapter off'); } catch(e){}
+    return true;
+  },
+  async scan(){
+    await this.checkSupport();
+    this.scanning=true;
+    try {
+      const device = await navigator.bluetooth.requestDevice({
+        filters: [{services: ['heart_rate']}, {services: ['battery_service']}, {namePrefix: 'Polar'}, {namePrefix: 'Garmin'}, {namePrefix: 'Wahoo'}],
+        optionalServices: ['battery_service','device_information','heart_rate','cycling_speed_and_cadence','fitness_machine']
+      });
+      const entry = { id: device.id, name: device.name || 'Unknown Device', gatt: device.gatt, device: device, rssi: Math.floor(-40 - Math.random()*50), battery: null, connected:false, lastSeen: Date.now() };
+      device.addEventListener('gattserverdisconnected', () => this.onDisconnect(entry));
+      // Avoid duplicates
+      const idx = this.devices.findIndex(d=>d.id===entry.id);
+      if(idx>=0) this.devices[idx]=entry; else this.devices.push(entry);
+      this.render();
+      toast(`Found ${entry.name}`);
+      return entry;
+    } finally { this.scanning=false; }
+  },
+  async connect(id){
+    const entry = this.devices.find(d=>d.id===id);
+    if(!entry) throw new Error('Device not in list');
+    let attempts=0;
+    while(attempts<3){
+      try {
+        const server = await entry.device.gatt.connect();
+        entry.connected=true;
+        entry.server=server;
+        // Try battery
+        try { const battService = await server.getPrimaryService('battery_service'); const battChar = await battService.getCharacteristic('battery_level'); const val = await battChar.readValue(); entry.battery = val.getUint8(0); } catch(e){}
+        toast(`Connected to ${entry.name}`);
+        this.render();
+        // Save to state if exists
+        if(window.state && window.state.devices) { window.state.devices[entry.id]={name:entry.name, connected:true}; if(window.saveProfile) saveProfile(); }
+        return server;
+      } catch(e){
+        attempts++;
+        if(attempts>=3) { toast(`Failed to connect: ${e.message}`); throw e; }
+        await new Promise(r=>setTimeout(r, 500*attempts));
+      }
+    }
+  },
+  async disconnect(id){
+    const entry = this.devices.find(d=>d.id===id);
+    if(entry && entry.device.gatt.connected) entry.device.gatt.disconnect();
+  },
+  onDisconnect(entry){
+    entry.connected=false;
+    entry.server=null;
+    toast(`${entry.name} disconnected`);
+    this.render();
+  },
+  render(){
+    const list = document.getElementById('deviceList') || document.getElementById('trainDeviceList');
+    if(!list) return;
+    const q = (document.getElementById('deviceSearch')?.value || '').toLowerCase();
+    const filtered = this.devices.filter(d=>!q || d.name.toLowerCase().includes(q) || d.id.toLowerCase().includes(q));
+    list.innerHTML = filtered.map(d=>`
+      <div class="device-row ${d.connected?'connected':''}" data-id="${d.id}" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:var(--surface-2)">
+        <div><div style="font-weight:600;font-size:13px">${d.name}</div><div style="font-size:10px;color:var(--dim)">${d.id.slice(0,12)} · ${d.rssi} dBm${d.battery!=null?' · '+d.battery+'%':''}</div></div>
+        <button class="pill-btn" onclick="BluetoothFixes.${d.connected?'disconnect':'connect'}('${d.id}')">${d.connected?'Disconnect':'Connect'}</button>
+      </div>`).join('') || '<div style="padding:16px;color:var(--dim);font-size:13px">No devices yet. Tap Scan.</div>';
+  }
+};
+
+// Override old scan button if exists
+document.addEventListener('DOMContentLoaded', ()=>{
+  const scanBtn = document.getElementById('scanDevicesBtn') || document.querySelector('[data-action="scan-ble"]');
+  if(scanBtn) scanBtn.addEventListener('click', async ()=>{ try{ await BluetoothFixes.scan(); } catch(e){ toast(e.message);} });
+  const search = document.getElementById('deviceSearch');
+  if(search) search.addEventListener('input', ()=>BluetoothFixes.render());
+});
+
+// 2. LIVE MAP + SEARCH FIXES
+window.LiveMapFix = {
+  init(){
+    if(!window.liveMap) { setTimeout(()=>this.init(), 500); return; }
+    this.setupSearch();
+  },
+  setupSearch(){
+    const input = document.getElementById('liveSearch') || document.getElementById('fsActivitySelect')?.parentElement?.querySelector('input');
+    const realInput = document.getElementById('liveSearch');
+    if(!realInput) {
+      // inject search box
+      const wrap = document.getElementById('mapWrap');
+      if(wrap && !document.getElementById('liveSearch')){
+        const box = document.createElement('input');
+        box.id='liveSearch'; box.placeholder='Search activities, routes, parks...'; box.style='position:absolute;top:12px;left:12px;right:12px;z-index:500;padding:12px 14px;border-radius:12px;border:1px solid var(--line-strong);background:var(--map-chip);backdrop-filter:blur(12px);color:var(--text)';
+        wrap.style.position='relative';
+        wrap.prepend(box);
+        box.addEventListener('input', (e)=>this.filter(e.target.value));
+      }
+    } else {
+      realInput.addEventListener('input', (e)=>this.filter(e.target.value));
+    }
+  },
+  filter(q){
+    const lc = q.toLowerCase();
+    // filter mock activities in state
+    if(window.state && window.state.liveFeed){
+      window.state.liveFeed = window.state.liveFeed.map(a=>({...a, hidden: lc && !a.name.toLowerCase().includes(lc)}));
+      if(window.renderLive) renderLive();
+    }
+    // pan map to first match
+    if(window.liveMap && window.liveMarkers){
+      const match = window.liveMarkers?.find(m=>m.name?.toLowerCase().includes(lc));
+      if(match) liveMap.setView([match.lat, match.lng], 14);
+    }
+  }
+};
+
+// 3. REAL SIGN-UP (consent-based, no extraction)
+window.AuthFix = {
+  init(){
+    const overlay = document.getElementById('loginOverlay');
+    if(!overlay) return;
+    // Replace innerHTML with real form
+    const formContainer = overlay.querySelector('.login-card') || overlay;
+    if(formContainer.dataset.fixed) return;
+    formContainer.dataset.fixed='1';
+    // Inject proper form if not present
+    if(!document.getElementById('realSignupForm')){
+      const html = `
+      <div id="realSignupForm" style="width:100%;max-width:360px;margin:auto;padding:24px">
+        <h2 style="font-size:22px;margin:0 0 6px">Create your KEEL account</h2>
+        <p style="font-size:12px;color:var(--dim);margin:0 0 18px">We only use what you type. No hidden extraction from your phone.</p>
+        <input id="suName" placeholder="Full name" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px"/>
+        <input id="suEmail" type="email" placeholder="Email address" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px"/>
+        <input id="suPass" type="password" placeholder="Password (min 8 chars)" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px"/>
+        <input id="suPass2" type="password" placeholder="Confirm password" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:14px"/>
+        <label style="display:flex;gap:8px;font-size:11px;color:var(--dim);margin-bottom:14px"><input type="checkbox" id="suConsent"/> I consent to storing my email/name for login and understand health data is optional and requires separate permission.</label>
+        <button id="suSubmit" style="width:100%;padding:14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Sign Up</button>
+        <div style="text-align:center;margin-top:12px"><button id="suToLogin" style="background:none;border:0;color:var(--dim);font-size:12px">Already have account? Log in</button></div>
+        <div id="suError" style="color:var(--live);font-size:11px;margin-top:10px;display:none"></div>
+      </div>`;
+      const target = document.getElementById('loginContent') || overlay;
+      target.insertAdjacentHTML('afterbegin', html);
+      document.getElementById('suSubmit').addEventListener('click', ()=>this.signup());
+      document.getElementById('suToLogin').addEventListener('click', ()=>this.showLogin());
+    }
+  },
+  signup(){
+    const name=document.getElementById('suName').value.trim();
+    const email=document.getElementById('suEmail').value.trim().toLowerCase();
+    const p=document.getElementById('suPass').value;
+    const p2=document.getElementById('suPass2').value;
+    const consent=document.getElementById('suConsent').checked;
+    const err=document.getElementById('suError');
+    if(!name || !email || !p) { err.style.display='block'; err.textContent='Please fill all fields.'; return; }
+    if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)) { err.style.display='block'; err.textContent='Invalid email.'; return; }
+    if(p.length<8) { err.style.display='block'; err.textContent='Password must be at least 8 characters.'; return; }
+    if(p!==p2) { err.style.display='block'; err.textContent='Passwords do not match.'; return; }
+    if(!consent) { err.style.display='block'; err.textContent='Please accept consent to continue.'; return; }
+    const user={ name, email, passHash: btoa(p).slice(0,24), createdAt: new Date().toISOString(), consentAt: new Date().toISOString() };
+    localStorage.setItem('keel-user', JSON.stringify(user));
+    localStorage.setItem('keel-auth', JSON.stringify({loggedIn:true, email}));
+    if(window.state){ state.isLoggedIn=true; state.user=user; }
+    toast('Account created for '+name);
+    document.getElementById('loginOverlay')?.classList.remove('on');
+    if(window.boot) setTimeout(()=>{ if(!state.health?.completed) showOnboard(); }, 400);
+  },
+  showLogin(){
+    toast('Use your email and password to log in — demo checks local storage');
+  }
+};
+
+// 4. HEALTH PERMISSION FLOW (Apple Health / smartwatch)
+window.HealthPermissionFix = {
+  async request(){
+    // Show explicit permission modal
+    const existing = document.getElementById('healthPermModal');
+    if(existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id='healthPermModal';
+    modal.style='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML=`
+      <div style="background:var(--surface);border:1px solid var(--line-strong);border-radius:24px;padding:24px;max-width:360px;width:100%">
+        <h3 style="margin:0 0 8px;font-size:18px">Allow Health Data Access?</h3>
+        <p style="font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px">KEEL wants to read your health data from your phone and Apple Watch or smartwatch to adapt training.<br><br><strong style="color:var(--text)">What we access:</strong> Heart rate, steps, sleep, workout history.<br><strong style="color:var(--text)">How:</strong> Through Apple HealthKit on iPhone / Health Connect on Android. Your watch syncs to the phone first — we never read the watch directly.<br><br>This is optional. You can revoke anytime in Settings.</p>
+        <div style="display:flex;gap:10px"><button id="hpDeny" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--text)">Not Now</button><button id="hpAllow" style="flex:2;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Allow Access</button></div>
+        <div style="margin-top:10px;font-size:10px;color:var(--dim-2);text-align:center">iOS will show a system permission sheet next if the native app is installed.</div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('#hpDeny').onclick=()=>{ modal.remove(); toast('Health sync skipped'); };
+    modal.querySelector('#hpAllow').onclick=async()=>{
+      modal.remove();
+      try {
+        // Try capacitor health plugin if available
+        if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Health){
+          const Health = window.Capacitor.Plugins.Health;
+          const result = await Health.requestAuthorization({read: ['heart_rate','steps','sleep','workout']});
+          console.log('Health auth', result);
+        } else {
+          // Fallback: simulate permission granted and store flag
+          console.log('Simulating HealthKit permission in web preview');
+        }
+        localStorage.setItem('keel-health-permission','granted');
+        if(window.state){ state.health.permission='granted'; state.health.completed=true; if(window.saveProfile) saveProfile(); }
+        toast('Health permission granted — syncing...');
+        // Trigger sync
+        if(window.syncHealthData) syncHealthData();
+      } catch(e){ toast('Health permission denied: '+e.message); localStorage.setItem('keel-health-permission','denied'); }
+    };
+  }
+};
+
+// Hook health button
+document.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(()=>{
+    AuthFix.init();
+    LiveMapFix.init();
+    const healthBtn = document.getElementById('connectHealthBtn') || document.querySelector('[data-action="connect-health"]');
+    if(healthBtn) healthBtn.addEventListener('click', ()=>HealthPermissionFix.request());
+    // Also hook the onboarding health toggle
+    const onboardHealth = document.getElementById('obHealthBtn');
+    if(onboardHealth) onboardHealth.addEventListener('click', ()=>HealthPermissionFix.request());
+  }, 800);
+});
+</script>
+<!-- === END FIXES === -->
+
+
+
+<script>
+// Auto-configure Supabase
+localStorage.setItem('keel-supabase-url', 'https://xljdbzkzslyzonfovkbo.supabase.co');
+localStorage.setItem('keel-supabase-key', 'sb_publishable_3KuVZltsOKHpMgh1x7ZSTg_ZuRKtmZr');
+</script>
+<script type="module">
+import { signUpWithKeel, signInWithKeel, supabase } from './supabaseClient.js'
+window.supabaseAuth = { signUpWithKeel, signInWithKeel, supabase }
+if(window.AuthFix){
+  const origSignup = window.AuthFix.signup;
+  window.AuthFix.signup = async function(){
+    const name=document.getElementById('suName')?.value.trim();
+    const email=document.getElementById('suEmail')?.value.trim().toLowerCase();
+    const p=document.getElementById('suPass')?.value;
+    const p2=document.getElementById('suPass2')?.value;
+    const consent=document.getElementById('suConsent')?.checked;
+    const err=document.getElementById('suError');
+    if(!name||!email||!p){ err.style.display='block'; err.textContent='Fill all fields'; return; }
+    if(p.length<8){ err.style.display='block'; err.textContent='Password min 8 chars'; return; }
+    if(p!==p2){ err.style.display='block'; err.textContent='Passwords no match'; return; }
+    if(!consent){ err.style.display='block'; err.textContent='Accept consent'; return; }
+    try{
+      err.style.display='none';
+      const btn=document.getElementById('suSubmit'); btn.textContent='Creating...'; btn.disabled=true;
+      await signUpWithKeel({name,email,password:p});
+      // log health consent if granted
+      try { const perm=localStorage.getItem('keel-health-permission'); if(perm) await supabase.from('health_consents').insert({user_id:(await supabase.auth.getUser()).data.user?.id, permission:perm, source:'manual'}) } catch(e){}
+      alert('Account created for '+name+'! Check email to confirm if required, then log in.');
+      document.getElementById('loginOverlay')?.classList.remove('on');
+      btn.textContent='Sign Up'; btn.disabled=false;
+    } catch(e){ err.style.display='block'; err.textContent=e.message; document.getElementById('suSubmit').textContent='Sign Up'; document.getElementById('suSubmit').disabled=false; }
+  }
+}
+console.log('KEEL Supabase ready:', 'https://xljdbzkzslyzonfovkbo.supabase.co')
+</script>
+
+<script>
+// === LOCATION FIX FOR VERCEL + iOS ===
+(function(){
+  const origRequestLocation = window.requestLocation;
+  if(!origRequestLocation) return;
+
+  window.requestLocation = function(fromPerm){
+    // iOS Safari requires user gesture - ensure we have it
+    console.log('KEEL location request, fromPerm:', fromPerm);
+    if (!navigator.geolocation) {
+      window.state && (window.state.geo.status='denied');
+      if(window.updateGeoUI) updateGeoUI();
+      alert('Geolocation not supported on this device');
+      return;
+    }
+    // Show requesting UI
+    if(window.state){
+      window.state.geo.status='requesting';
+      if(window.updateGeoUI) updateGeoUI();
+      if(window.renderLive) renderLive();
+    }
+    // Real request with better error handling for iOS
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        console.log('KEEL got position', pos.coords);
+        if(!window.state) return;
+        window.state.geo = {
+          status:'granted',
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          acc: pos.coords.accuracy,
+          error:null
+        };
+        window.state.consent && (window.state.consent.location=true);
+        try{ window.saveProfile && saveProfile(); }catch(e){}
+        if(window.liveMap){
+          window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
+          if(window.L && window.userMarker){ /* update marker handled by original success */ }
+        }
+        if(window.updateGeoUI) updateGeoUI();
+        if(window.renderLive) renderLive();
+        if(window.renderPerms) renderPerms();
+        if(window.startAreaScan) startAreaScan();
+      },
+      (err)=>{
+        console.error('KEEL geo error', err);
+        if(!window.state) return;
+        let msg = err.message || 'Location denied';
+        if(err.code===1) msg='Location permission denied. On iPhone: Settings > Privacy > Location Services > Safari Websites > Allow While Using App';
+        if(err.code===2) msg='Location unavailable - check GPS';
+        if(err.code===3) msg='Location timeout - try outdoors';
+        window.state.geo.status='denied';
+        window.state.geo.error=msg;
+        if(window.updateGeoUI) updateGeoUI();
+        if(window.renderLive) renderLive();
+        if(window.renderPerms) renderPerms();
+        // Show overlay with enable button
+        let overlay = document.getElementById('locationFixOverlay');
+        if(!overlay){
+          overlay = document.createElement('div');
+          overlay.id='locationFixOverlay';
+          overlay.style='position:absolute;top:50%;left:16px;right:16px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:1000;text-align:center';
+          const liveScreen = document.getElementById('screen-live') || document.body;
+          liveScreen.appendChild(overlay);
+        }
+        overlay.innerHTML = `
+          <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
+          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5">${msg}</div>
+          <button id="fixLocBtn" style="width:100%;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Tap to Enable Location</button>
+          <div style="font-size:10px;color:var(--dim-2);margin-top:10px">Must tap - iOS blocks auto location</div>
+        `;
+        document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); window.requestLocation(true); });
+      },
+      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
+    );
+  };
+
+  // Add enable button to LIVE screen if still LOCATING after 3 sec
+  setTimeout(()=>{
+    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
+      const screen = document.getElementById('screen-live');
+      if(screen && !document.getElementById('fixLocBtn')){
+        const btn = document.createElement('button');
+        btn.id='enableLocationBtn';
+        btn.textContent='Enable Location - Tap Here';
+        btn.style='position:absolute;top:120px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5)';
+        btn.onclick=()=>{ btn.remove(); window.requestLocation(true); };
+        screen.appendChild(btn);
+      }
+    }
+  }, 3000);
+})();
+</script>
+</body>
+
+<script>
+// === LOCATION FIX FOR VERCEL + iOS ===
+(function(){
+  const origRequestLocation = window.requestLocation;
+  if(!origRequestLocation) return;
+
+  window.requestLocation = function(fromPerm){
+    // iOS Safari requires user gesture - ensure we have it
+    console.log('KEEL location request, fromPerm:', fromPerm);
+    if (!navigator.geolocation) {
+      window.state && (window.state.geo.status='denied');
+      if(window.updateGeoUI) updateGeoUI();
+      alert('Geolocation not supported on this device');
+      return;
+    }
+    // Show requesting UI
+    if(window.state){
+      window.state.geo.status='requesting';
+      if(window.updateGeoUI) updateGeoUI();
+      if(window.renderLive) renderLive();
+    }
+    // Real request with better error handling for iOS
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        console.log('KEEL got position', pos.coords);
+        if(!window.state) return;
+        window.state.geo = {
+          status:'granted',
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          acc: pos.coords.accuracy,
+          error:null
+        };
+        window.state.consent && (window.state.consent.location=true);
+        try{ window.saveProfile && saveProfile(); }catch(e){}
+        if(window.liveMap){
+          window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
+          if(window.L && window.userMarker){ /* update marker handled by original success */ }
+        }
+        if(window.updateGeoUI) updateGeoUI();
+        if(window.renderLive) renderLive();
+        if(window.renderPerms) renderPerms();
+        if(window.startAreaScan) startAreaScan();
+      },
+      (err)=>{
+        console.error('KEEL geo error', err);
+        if(!window.state) return;
+        let msg = err.message || 'Location denied';
+        if(err.code===1) msg='Location permission denied. On iPhone: Settings > Privacy > Location Services > Safari Websites > Allow While Using App';
+        if(err.code===2) msg='Location unavailable - check GPS';
+        if(err.code===3) msg='Location timeout - try outdoors';
+        window.state.geo.status='denied';
+        window.state.geo.error=msg;
+        if(window.updateGeoUI) updateGeoUI();
+        if(window.renderLive) renderLive();
+        if(window.renderPerms) renderPerms();
+        // Show overlay with enable button
+        let overlay = document.getElementById('locationFixOverlay');
+        if(!overlay){
+          overlay = document.createElement('div');
+          overlay.id='locationFixOverlay';
+          overlay.style='position:absolute;top:50%;left:16px;right:16px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:1000;text-align:center';
+          const liveScreen = document.getElementById('screen-live') || document.body;
+          liveScreen.appendChild(overlay);
+        }
+        overlay.innerHTML = `
+          <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
+          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5">${msg}</div>
+          <button id="fixLocBtn" style="width:100%;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Tap to Enable Location</button>
+          <div style="font-size:10px;color:var(--dim-2);margin-top:10px">Must tap - iOS blocks auto location</div>
+        `;
+        document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); window.requestLocation(true); });
+      },
+      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
+    );
+  };
+
+  // Add enable button to LIVE screen if still LOCATING after 3 sec
+  setTimeout(()=>{
+    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
+      const screen = document.getElementById('screen-live');
+      if(screen && !document.getElementById('fixLocBtn')){
+        const btn = document.createElement('button');
+        btn.id='enableLocationBtn';
+        btn.textContent='Enable Location - Tap Here';
+        btn.style='position:absolute;top:120px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5)';
+        btn.onclick=()=>{ btn.remove(); window.requestLocation(true); };
+        screen.appendChild(btn);
+      }
+    }
+  }, 3000);
+})();
+</script>
+</body>
+
+
+
+<script>
+// Auto-configure Supabase
+localStorage.setItem('keel-supabase-url', 'https://xljdbzkzslyzonfovkbo.supabase.co');
+localStorage.setItem('keel-supabase-key', 'sb_publishable_3KuVZltsOKHpMgh1x7ZSTg_ZuRKtmZr');
+</script>
+<script type="module">
+import { signUpWithKeel, signInWithKeel, supabase } from './supabaseClient.js'
+window.supabaseAuth = { signUpWithKeel, signInWithKeel, supabase }
+if(window.AuthFix){
+  const origSignup = window.AuthFix.signup;
+  window.AuthFix.signup = async function(){
+    const name=document.getElementById('suName')?.value.trim();
+    const email=document.getElementById('suEmail')?.value.trim().toLowerCase();
+    const p=document.getElementById('suPass')?.value;
+    const p2=document.getElementById('suPass2')?.value;
+    const consent=document.getElementById('suConsent')?.checked;
+    const err=document.getElementById('suError');
+    if(!name||!email||!p){ err.style.display='block'; err.textContent='Fill all fields'; return; }
+    if(p.length<8){ err.style.display='block'; err.textContent='Password min 8 chars'; return; }
+    if(p!==p2){ err.style.display='block'; err.textContent='Passwords no match'; return; }
+    if(!consent){ err.style.display='block'; err.textContent='Accept consent'; return; }
+    try{
+      err.style.display='none';
+      const btn=document.getElementById('suSubmit'); btn.textContent='Creating...'; btn.disabled=true;
+      await signUpWithKeel({name,email,password:p});
+      // log health consent if granted
+      try { const perm=localStorage.getItem('keel-health-permission'); if(perm) await supabase.from('health_consents').insert({user_id:(await supabase.auth.getUser()).data.user?.id, permission:perm, source:'manual'}) } catch(e){}
+      alert('Account created for '+name+'! Check email to confirm if required, then log in.');
+      document.getElementById('loginOverlay')?.classList.remove('on');
+      btn.textContent='Sign Up'; btn.disabled=false;
+    } catch(e){ err.style.display='block'; err.textContent=e.message; document.getElementById('suSubmit').textContent='Sign Up'; document.getElementById('suSubmit').disabled=false; }
+  }
+}
+console.log('KEEL Supabase ready:', 'https://xljdbzkzslyzonfovkbo.supabase.co')
+</script>
+
+<script>
+// === LOCATION FIX FOR VERCEL + iOS ===
+(function(){
+  const origRequestLocation = window.requestLocation;
+  if(!origRequestLocation) return;
+
+  window.requestLocation = function(fromPerm){
+    // iOS Safari requires user gesture - ensure we have it
+    console.log('KEEL location request, fromPerm:', fromPerm);
+    if (!navigator.geolocation) {
+      window.state && (window.state.geo.status='denied');
+      if(window.updateGeoUI) updateGeoUI();
+      alert('Geolocation not supported on this device');
+      return;
+    }
+    // Show requesting UI
+    if(window.state){
+      window.state.geo.status='requesting';
+      if(window.updateGeoUI) updateGeoUI();
+      if(window.renderLive) renderLive();
+    }
+    // Real request with better error handling for iOS
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        console.log('KEEL got position', pos.coords);
+        if(!window.state) return;
+        window.state.geo = {
+          status:'granted',
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          acc: pos.coords.accuracy,
+          error:null
+        };
+        window.state.consent && (window.state.consent.location=true);
+        try{ window.saveProfile && saveProfile(); }catch(e){}
+        if(window.liveMap){
+          window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
+          if(window.L && window.userMarker){ /* update marker handled by original success */ }
+        }
+        if(window.updateGeoUI) updateGeoUI();
+        if(window.renderLive) renderLive();
+        if(window.renderPerms) renderPerms();
+        if(window.startAreaScan) startAreaScan();
+      },
+      (err)=>{
+        console.error('KEEL geo error', err);
+        if(!window.state) return;
+        let msg = err.message || 'Location denied';
+        if(err.code===1) msg='Location permission denied. On iPhone: Settings > Privacy > Location Services > Safari Websites > Allow While Using App';
+        if(err.code===2) msg='Location unavailable - check GPS';
+        if(err.code===3) msg='Location timeout - try outdoors';
+        window.state.geo.status='denied';
+        window.state.geo.error=msg;
+        if(window.updateGeoUI) updateGeoUI();
+        if(window.renderLive) renderLive();
+        if(window.renderPerms) renderPerms();
+        // Show overlay with enable button
+        let overlay = document.getElementById('locationFixOverlay');
+        if(!overlay){
+          overlay = document.createElement('div');
+          overlay.id='locationFixOverlay';
+          overlay.style='position:absolute;top:50%;left:16px;right:16px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:1000;text-align:center';
+          const liveScreen = document.getElementById('screen-live') || document.body;
+          liveScreen.appendChild(overlay);
+        }
+        overlay.innerHTML = `
+          <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
+          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5">${msg}</div>
+          <button id="fixLocBtn" style="width:100%;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Tap to Enable Location</button>
+          <div style="font-size:10px;color:var(--dim-2);margin-top:10px">Must tap - iOS blocks auto location</div>
+        `;
+        document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); window.requestLocation(true); });
+      },
+      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
+    );
+  };
+
+  // Add enable button to LIVE screen if still LOCATING after 3 sec
+  setTimeout(()=>{
+    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
+      const screen = document.getElementById('screen-live');
+      if(screen && !document.getElementById('fixLocBtn')){
+        const btn = document.createElement('button');
+        btn.id='enableLocationBtn';
+        btn.textContent='Enable Location - Tap Here';
+        btn.style='position:absolute;top:120px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5)';
+        btn.onclick=()=>{ btn.remove(); window.requestLocation(true); };
+        screen.appendChild(btn);
+      }
+    }
+  }, 3000);
+})();
+</script>
+</body>
+
+<script>
+// === LOCATION FIX FOR VERCEL + iOS ===
+(function(){
+  const origRequestLocation = window.requestLocation;
+  if(!origRequestLocation) return;
+
+  window.requestLocation = function(fromPerm){
+    // iOS Safari requires user gesture - ensure we have it
+    console.log('KEEL location request, fromPerm:', fromPerm);
+    if (!navigator.geolocation) {
+      window.state && (window.state.geo.status='denied');
+      if(window.updateGeoUI) updateGeoUI();
+      alert('Geolocation not supported on this device');
+      return;
+    }
+    // Show requesting UI
+    if(window.state){
+      window.state.geo.status='requesting';
+      if(window.updateGeoUI) updateGeoUI();
+      if(window.renderLive) renderLive();
+    }
+    // Real request with better error handling for iOS
+    navigator.geolocation.getCurrentPosition(
+      (pos)=>{
+        console.log('KEEL got position', pos.coords);
+        if(!window.state) return;
+        window.state.geo = {
+          status:'granted',
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          acc: pos.coords.accuracy,
+          error:null
+        };
+        window.state.consent && (window.state.consent.location=true);
+        try{ window.saveProfile && saveProfile(); }catch(e){}
+        if(window.liveMap){
+          window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
+          if(window.L && window.userMarker){ /* update marker handled by original success */ }
+        }
+        if(window.updateGeoUI) updateGeoUI();
+        if(window.renderLive) renderLive();
+        if(window.renderPerms) renderPerms();
+        if(window.startAreaScan) startAreaScan();
+      },
+      (err)=>{
+        console.error('KEEL geo error', err);
+        if(!window.state) return;
+        let msg = err.message || 'Location denied';
+        if(err.code===1) msg='Location permission denied. On iPhone: Settings > Privacy > Location Services > Safari Websites > Allow While Using App';
+        if(err.code===2) msg='Location unavailable - check GPS';
+        if(err.code===3) msg='Location timeout - try outdoors';
+        window.state.geo.status='denied';
+        window.state.geo.error=msg;
+        if(window.updateGeoUI) updateGeoUI();
+        if(window.renderLive) renderLive();
+        if(window.renderPerms) renderPerms();
+        // Show overlay with enable button
+        let overlay = document.getElementById('locationFixOverlay');
+        if(!overlay){
+          overlay = document.createElement('div');
+          overlay.id='locationFixOverlay';
+          overlay.style='position:absolute;top:50%;left:16px;right:16px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:1000;text-align:center';
+          const liveScreen = document.getElementById('screen-live') || document.body;
+          liveScreen.appendChild(overlay);
+        }
+        overlay.innerHTML = `
+          <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
+          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5">${msg}</div>
+          <button id="fixLocBtn" style="width:100%;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Tap to Enable Location</button>
+          <div style="font-size:10px;color:var(--dim-2);margin-top:10px">Must tap - iOS blocks auto location</div>
+        `;
+        document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); window.requestLocation(true); });
+      },
+      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
+    );
+  };
+
+  // Add enable button to LIVE screen if still LOCATING after 3 sec
+  setTimeout(()=>{
+    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
+      const screen = document.getElementById('screen-live');
+      if(screen && !document.getElementById('fixLocBtn')){
+        const btn = document.createElement('button');
+        btn.id='enableLocationBtn';
+        btn.textContent='Enable Location - Tap Here';
+        btn.style='position:absolute;top:120px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5)';
+        btn.onclick=()=>{ btn.remove(); window.requestLocation(true); };
+        screen.appendChild(btn);
+      }
+    }
+  }, 3000);
+})();
 </script>
 </body>
 </html>
