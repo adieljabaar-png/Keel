@@ -1,5 +1,5 @@
-/* KEEL Service Worker - FIXED for location + Bluetooth + Login + Vercel deploy - Build 80 v2.0.8 */
-const CACHE_VERSION = 'keel-v2.0.8';   // BUMP to force clear LOCATING stuck cache - Build 80
+/* KEEL Service Worker — FIXED for location + Vercel deploy */
+const CACHE_VERSION = 'keel-v2.0.0';   // BUMP MAJOR to force clear LOCATING stuck cache
 const CACHE_NAME = CACHE_VERSION;
 
 const PRECACHE_URLS = [
@@ -12,7 +12,7 @@ const PRECACHE_URLS = [
 
 const NAV_ROUTES = ['/', '/index.html', '/home', '/live', '/train', '/you', '/menu'];
 
-const OFFLINE_HTML = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KEEL - Offline</title><style>body{margin:0;background:#090A0C;color:#F4F5F7;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;padding:24px}.wrap{max-width:320px}h1{font-size:14px;letter-spacing:.24em;color:#C9F24E;margin:0 0 14px;font-weight:700}p{font-size:13px;color:#8A9099;line-height:1.6;margin:0 0 20px}a{display:inline-block;padding:12px 22px;border-radius:100px;background:#C9F24E;color:#0A0C05;font-weight:700;font-size:13px;text-decoration:none}</style></head><body><div class="wrap"><h1>KEEL</h1><p>You're offline. Reconnect to get live location and health sync.</p><a href="javascript:location.reload()">Retry</a></div></body></html>`;
+const OFFLINE_HTML = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KEEL — Offline</title><style>body{margin:0;background:#090A0C;color:#F4F5F7;font-family:-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;padding:24px}.wrap{max-width:320px}h1{font-size:14px;letter-spacing:.24em;color:#C9F24E;margin:0 0 14px;font-weight:700}p{font-size:13px;color:#8A9099;line-height:1.6;margin:0 0 20px}a{display:inline-block;padding:12px 22px;border-radius:100px;background:#C9F24E;color:#0A0C05;font-weight:700;font-size:13px;text-decoration:none}</style></head><body><div class="wrap"><h1>KEEL</h1><p>You're offline. Reconnect to get live location and health sync.</p><a href="javascript:location.reload()">Retry</a></div></body></html>`;
 
 async function sanitizeResponse(res) {
   if (!res) return res;
@@ -34,7 +34,6 @@ self.addEventListener('install', event => {
         if (res && res.ok) await cache.put(url, await sanitizeResponse(res));
       } catch(_){}
     }
-    console.log('KEEL SW v2.0.8 installed - forcing clear of old caches');
     await self.skipWaiting();
   })());
 });
@@ -42,15 +41,14 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    // DELETE ALL OLD CACHES - fixes stuck LOCATING and LOGIN
-    console.log('KEEL SW activating, deleting old caches:', keys);
+    // DELETE ALL OLD CACHES - fixes stuck LOCATING
     await Promise.all(keys.filter(k => k !== CACHE_NAME && k !== 'keel-pending-uploads-v1').map(k => caches.delete(k)));
     if (self.registration.navigationPreload) {
       try { await self.registration.navigationPreload.enable(); } catch(_){}
     }
     await self.clients.claim();
     const clients = await self.clients.matchAll({ type: 'window' });
-    clients.forEach(c => c.postMessage({ type: 'SW_ACTIVATED', version: CACHE_NAME, msg: 'Build 80 - Location + Bluetooth + Login fixed - please allow location and tap SYNC PHONE DEVICES for Apple Watch' }));
+    clients.forEach(c => c.postMessage({ type: 'SW_ACTIVATED', version: CACHE_NAME, msg: 'Location fix applied - please allow location' }));
   })());
 });
 
@@ -60,7 +58,7 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (!url.protocol.startsWith('http')) return;
 
-  // ALWAYS network-first for critical files - THIS FIXES LOCATION + LOGIN + BT
+  // ALWAYS network-first for critical files - THIS FIXES LOCATION
   if (url.pathname.endsWith('/index.html') || url.pathname === '/' || url.pathname.endsWith('/sw.js') || url.pathname.endsWith('/manifest.json') || url.pathname.endsWith('/supabaseClient.js')) {
     event.respondWith(
       fetch(req).then(async res => {

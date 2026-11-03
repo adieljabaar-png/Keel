@@ -1,0 +1,78 @@
+{
+  "appId": "com.keel.steady",
+  "appName": "KEEL",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "BluetoothLe": {
+      "displayStrings": {
+        "scanning": "Scanning for watches & wearables...",
+        "cancel": "Cancel",
+        "availableDevices": "Available devices",
+        "noDeviceFound": "No wearables found - ensure device is advertising"
+      }
+    },
+    "Geolocation": {
+      "permissions": [
+        "location"
+      ]
+    },
+    "Health": {
+      "permissions": [
+        "read:heart_rate",
+        "read:steps",
+        "read:sleep",
+        "read:workout",
+        "read:blood_oxygen",
+        "read:calories"
+      ]
+    },
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#C9F24E",
+      "sound": "beep.wav"
+    },
+    "SplashScreen": {
+      "launchShowDuration": 1200
+    },
+    "App": {
+      "launchUrl": ""
+    }
+  },
+  "ios": {
+    "contentInset": "always",
+    "backgroundColor": "#090A0C",
+    "infoPlist": {
+      "NSBluetoothAlwaysUsageDescription": "KEEL uses Bluetooth to scan and connect to any smartwatch, Apple Watch via companion, or wear gear for health monitoring.",
+      "NSBluetoothPeripheralUsageDescription": "KEEL needs Bluetooth to find nearby heart rate and fitness devices.",
+      "NSLocationWhenInUseUsageDescription": "KEEL shows your live location, hiking trails within 5km, and nearby public users on the map.",
+      "NSLocationAlwaysAndWhenInUseUsageDescription": "KEEL can track your route in background during a training session.",
+      "NSHealthShareUsageDescription": "KEEL reads heart rate, steps, sleep, workouts, SpO2 from Apple Health. Apple Watch data comes via Apple Health.",
+      "NSHealthUpdateUsageDescription": "KEEL can save workout sessions to Apple Health if you allow.",
+      "UIBackgroundModes": [
+        "bluetooth-central",
+        "location",
+        "fetch",
+        "remote-notification"
+      ]
+    }
+  },
+  "android": {
+    "backgroundColor": "#090A0C",
+    "permissions": [
+      "android.permission.BLUETOOTH",
+      "android.permission.BLUETOOTH_ADMIN",
+      "android.permission.BLUETOOTH_SCAN",
+      "android.permission.BLUETOOTH_CONNECT",
+      "android.permission.ACCESS_FINE_LOCATION",
+      "android.permission.ACCESS_COARSE_LOCATION",
+      "android.permission.ACCESS_BACKGROUND_LOCATION",
+      "android.permission.ACTIVITY_RECOGNITION",
+      "android.permission.BODY_SENSORS",
+      "android.permission.POST_NOTIFICATIONS"
+    ]
+  }
+}
