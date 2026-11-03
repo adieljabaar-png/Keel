@@ -1,60 +1,22 @@
 {
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "headers": [
+  "version": 2,
+  "public": true,
+  "github": {
+    "silent": true
+  },
+  "builds": [
     {
-      "source": "/sw.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        },
-        {
-          "key": "Service-Worker-Allowed",
-          "value": "/"
-        }
-      ]
-    },
-    {
-      "source": "/index.html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/manifest.json",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/supabaseClient.js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
+      "src": "index.html",
+      "use": "@vercel/static"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/sw.js",
-      "destination": "/sw.js"
-    },
-    {
-      "source": "/supabaseClient.js",
-      "destination": "/supabaseClient.js"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/(.*)",
+      "dest": "/$1"
     }
-  ]
+  ],
+  "installCommand": "echo 'skip install'",
+  "buildCommand": "echo 'skip build'",
+  "outputDirectory": "."
 }

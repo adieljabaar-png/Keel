@@ -1,40 +1,12 @@
 {
   "name": "keel-app",
-  "version": "1.5.0",
-  "description": "KEEL 1.5 - PWA with location, Bluetooth, internet for any smartwatch / Apple Watch / wear gear, health abnormality alerts, 5km hiking trails map, nearby public users, You tab health sync, signup name at top right",
-  "main": "index.js",
+  "version": "1.5.1",
+  "private": true,
+  "description": "KEEL - static PWA, no native build on Vercel",
   "scripts": {
-    "sync": "cap sync",
-    "open:ios": "cap open ios",
-    "open:android": "cap open android",
-    "build": "mkdir -p www && cp index.html manifest.json sw.js www/ 2>/dev/null; echo built",
-    "dev": "npx serve ."
+    "build": "echo 'Static PWA - no build needed'",
+    "vercel-build": "echo 'Keel static deploy ok'"
   },
-  "keywords": [
-    "fitness",
-    "health",
-    "capacitor",
-    "pwa",
-    "bluetooth",
-    "apple-watch",
-    "wearos",
-    "hiking"
-  ],
-  "author": "Adiel Jabaar",
-  "license": "ISC",
-  "dependencies": {
-    "@capacitor/android": "^6.0.0",
-    "@capacitor/core": "^6.0.0",
-    "@capacitor/ios": "^6.0.0",
-    "@capacitor-community/bluetooth-le": "^3.1.0",
-    "@capacitor-community/health": "^1.0.0",
-    "@capacitor/geolocation": "^6.0.0",
-    "@capacitor/app": "^6.0.0",
-    "@capacitor/haptics": "^6.0.0",
-    "@capacitor/local-notifications": "^6.0.0",
-    "@capacitor/share": "^6.0.0"
-  },
-  "devDependencies": {
-    "@capacitor/cli": "^6.0.0"
-  }
+  "dependencies": {},
+  "devDependencies": {}
 }
