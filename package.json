@@ -1,0 +1,12 @@
+{
+  "name": "keel-app",
+  "version": "1.5.1",
+  "private": true,
+  "description": "KEEL - static PWA, no native build on Vercel",
+  "scripts": {
+    "build": "echo 'Static PWA - no build needed'",
+    "vercel-build": "echo 'Keel static deploy ok'"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
