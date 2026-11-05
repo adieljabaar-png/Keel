@@ -1,44 +1,25 @@
 {
-  "name": "KEEL \u2014 Steady by design",
+  "name": "KEEL — Steady by design",
   "short_name": "KEEL",
-  "description": "Adaptive training companion with real-time Bluetooth health monitoring, live map with 5km hiking trails, public nearby users, and Apple Watch via HealthKit/Health Connect.",
+  "description": "Adaptive training companion with real-time Bluetooth health monitoring, live map, and optional Apple Health / Google Fit sync (with explicit permission).",
   "start_url": "./#home",
   "scope": "./",
   "id": "keel-app",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "minimal-ui",
-    "browser"
-  ],
+  "display_override": ["standalone", "minimal-ui", "browser"],
   "orientation": "portrait",
   "background_color": "#090A0C",
   "theme_color": "#090A0C",
   "lang": "en",
-  "categories": [
-    "health",
-    "fitness",
-    "lifestyle"
-  ],
-  "permissions": [
-    "geolocation"
-  ],
-  "bluetooth": {
-    "optional_services": [
-      "heart_rate",
-      "battery_service",
-      "device_information",
-      "0000180d-0000-1000-8000-00805f9b34fb",
-      "generic_access"
-    ]
+  "dir": "ltr",
+  "categories": ["health", "fitness", "lifestyle", "medical"],
+  "prefer_related_applications": false,
+  "launch_handler": {
+    "client_mode": ["navigate-existing", "auto"]
   },
-  "permissions_policy": {
-    "geolocation": [
-      "self"
-    ],
-    "bluetooth": [
-      "self"
-    ]
+  "handle_links": "preferred",
+  "edge_side_panel": {
+    "preferred_width": 440
   },
   "icons": [
     {
@@ -72,39 +53,21 @@
       "short_name": "Start",
       "url": "./#home",
       "description": "Begin an adapted training session",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Live map",
       "short_name": "Live",
       "url": "./#live",
-      "description": "Live map with trails within 5km",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "description": "Open the live map — KEEL will ask for location access to show nearby public activities",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
     },
     {
       "name": "Health profile",
       "short_name": "Profile",
       "url": "./#you",
-      "description": "Your health + connected wearable data",
-      "icons": [
-        {
-          "src": "icon-192.png",
-          "sizes": "192x192",
-          "type": "image/png"
-        }
-      ]
+      "description": "Open your health profile and sync Fitness / Health data",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192", "type": "image/png" }]
     }
   ]
 }

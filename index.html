@@ -1,54 +1,29 @@
-<html lang="en" data-theme="dark"><style>* { -webkit-text-size-adjust: 132% !important; }</style><head><style>
-@font-face {
-  font-family: "Optimistic";
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
-}
-@font-face {
-  font-family: "Optimistic Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
-}
-:where(html) {
-  font-family: "Optimistic", system-ui, sans-serif;
-}
-:where(code, pre, kbd, samp) {
-  font-family: "Optimistic Mono", ui-monospace, monospace;
-}
-</style>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>KEEL — Steady by design</title>
 
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#090A0C" />
+<meta name="description" content="Adaptive training companion with real-time health monitoring." />
 
-  <script>
-  // Capacitor wrapper safe check - if not native, bridge will no-op gracefully
-  window.Capacitor = window.Capacitor || {};
-  </script>
-  <script type="module" src="./keel-native-bridge.js"></script>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#090A0C">
-<meta name="description" content="Adaptive training companion with real-time health monitoring.">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="KEEL" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png" />
+<link rel="shortcut icon" href="icon-192.png" />
+<link rel="mask-icon" href="icon-192.png" color="#C9F24E" />
+<meta name="msapplication-TileColor" content="#090A0C" />
+<meta name="msapplication-TileImage" content="icon-192.png" />
+<meta name="format-detection" content="telephone=no" />
 
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="KEEL">
-<link rel="apple-touch-icon" href="icon-192.png">
-<link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
-<meta name="mobile-web-app-capable" content="yes">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
-<link rel="shortcut icon" href="icon-192.png">
-<link rel="mask-icon" href="icon-192.png" color="#C9F24E">
-<meta name="msapplication-TileColor" content="#090A0C">
-<meta name="msapplication-TileImage" content="icon-192.png">
-<meta name="format-detection" content="telephone=no">
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
 /* ============================================================
    THEME TOKENS
@@ -137,6 +112,7 @@ body{display:flex;align-items:center;justify-content:center}
 .primary-btn{width:100%;margin:16px 0;padding:18px;border-radius:18px;border:0;cursor:pointer;background:var(--accent);color:var(--accent-ink);font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:-.01em;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .12s ease,filter .12s ease,background .3s ease;box-shadow:0 8px 30px rgba(201,242,78,.16)}
 html[data-theme="light"] .primary-btn{box-shadow:0 8px 26px rgba(143,191,31,.24)}
 .primary-btn:active{transform:scale(.985);filter:brightness(.94)}
+.primary-btn:disabled{opacity:.7;cursor:not-allowed}
 .primary-btn-icon{font-size:10px;transform:translateY(-.5px)}
 .secondary-btn{width:100%;padding:13px;border-radius:14px;border:1px solid var(--line-strong);background:var(--surface-3);color:var(--text);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:background .15s ease}
 .secondary-btn:active{filter:brightness(.92)}
@@ -183,7 +159,6 @@ html[data-theme="light"] .primary-btn{box-shadow:0 8px 26px rgba(143,191,31,.24)
 .lc-meta{font-size:11.5px;color:var(--dim-2);margin-top:4px}
 .lc-arrow{color:var(--dim-2);font-size:15px}
 
-/* MAP & FULL-SCREEN UI */
 .map-wrap{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--line);margin-bottom:16px;height:300px;background:var(--surface-2);z-index:1;transition:all .3s ease}
 .map-wrap.fullscreen{position:fixed;inset:0;z-index:1000;height:100dvh;border-radius:0;border:none;margin:0}
 #liveMap{width:100%;height:100%;display:block;z-index:1}
@@ -205,7 +180,6 @@ html[data-theme="light"] .primary-btn{box-shadow:0 8px 26px rgba(143,191,31,.24)
 .fs-controls{position:absolute;bottom:calc(120px + env(safe-area-inset-bottom));right:16px;display:flex;flex-direction:column;gap:12px;z-index:1000}
 .fs-ctrl-btn{width:48px;height:48px;border-radius:50%;background:var(--map-chip);border:1px solid var(--line-strong);color:var(--text);font-size:20px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(12px);cursor:pointer}
 
-/* TAB BORDER STYLING */
 html[data-theme="dark"] .nav-btn { border: 1px solid #ffffff; border-radius: 12px; margin: 0 4px; }
 html[data-theme="dark"] .nav-btn.active { border-color: var(--accent); box-shadow: 0 0 8px var(--accent); }
 html[data-theme="dark"] .pill, html[data-theme="dark"] .fs-pill { border: 1px solid #ffffff; }
@@ -365,10 +339,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 .toast{position:absolute;top:16px;left:50%;transform:translate(-50%,-24px);z-index:200;background:var(--surface-3);border:1px solid var(--line-strong);border-radius:100px;padding:11px 20px;font-size:12px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;white-space:nowrap;color:var(--text)}
 .toast.on{opacity:1;transform:translate(-50%,0)}
 
-.login-overlay{position:absolute;inset:0;z-index:140;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s}
+.login-overlay{position:absolute;inset:0;z-index:140;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .3s;overflow-y:auto}
 .login-overlay.on{opacity:1;pointer-events:auto}
 .login-btn{width:100%;max-width:320px;padding:16px;border-radius:16px;border:1px solid var(--line-strong);background:var(--surface);color:var(--text);font-family:var(--font);font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;cursor:pointer;transition:background .15s}
 .login-btn:active{background:var(--surface-2)}
+
+.auth-tabs{display:flex;gap:4px;margin-bottom:18px;background:var(--surface-2);padding:4px;border-radius:12px;width:100%;border:1px solid var(--line)}
+.auth-tab{flex:1;padding:10px;border-radius:9px;border:0;background:transparent;color:var(--dim);font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font);transition:.15s}
+.auth-tab.on{background:var(--surface-3);color:var(--text)}
+
 select.search-input{appearance:none;background-image:url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%238A9099%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");background-repeat:no-repeat,repeat;background-position:right .7em top 50%,0 0;background-size:.65em auto,100%}
 
 .leaflet-container { background: var(--surface-2); }
@@ -415,12 +394,13 @@ select.search-input{appearance:none;background-image:url("data:image/svg+xml;cha
 .info-kv{display:flex;justify-content:space-between;padding:7px 0;font-size:12.5px;gap:12px}
 .info-kv .k{color:var(--dim)}
 .info-kv .v{font-weight:600;text-align:right}
+
+.auth-error{display:none;padding:10px 12px;border-radius:10px;background:rgba(255,92,99,.12);border:1px solid rgba(255,92,99,.3);color:var(--live);font-size:12px;line-height:1.4;margin-bottom:12px}
 </style>
 
 <script>
-// Auto-configure Supabase URL from your project
 localStorage.setItem('keel-supabase-url', 'https://xljdbzkzslyzonfovkbo.supabase.co');
-console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co');
+localStorage.setItem('keel-supabase-key', 'sb_publishable_3KuVZltsOKHpMgh1x7ZSTg_ZuRKtmZr');
 </script>
 </head>
 <body>
@@ -443,18 +423,18 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       </header>
 
       <div class="hero">
-        <div class="hero-eyebrow" id="heroDate">SUNDAY · 1 NOV</div>
+        <div class="hero-eyebrow" id="heroDate">THURSDAY · 29 OCT</div>
         <h1 class="hero-title" id="heroGreeting">Welcome.</h1>
       </div>
 
       <div class="card readiness-card">
         <div class="ring-wrap">
           <svg class="ring" viewBox="0 0 150 150">
-            <circle class="ring-bg" cx="75" cy="75" r="58"></circle>
-            <circle class="ring-fg" id="ringFg" cx="75" cy="75" r="58" style="stroke-dasharray: 364.424748; stroke-dashoffset: 364.424748;"></circle>
+            <circle class="ring-bg" cx="75" cy="75" r="58"/>
+            <circle class="ring-fg" id="ringFg" cx="75" cy="75" r="58"/>
           </svg>
           <div class="ring-center">
-            <div class="ring-score num" id="readinessScore">0</div>
+            <div class="ring-score num" id="readinessScore">--</div>
             <div class="ring-label" id="readinessLabel">SYNCING</div>
           </div>
         </div>
@@ -467,11 +447,10 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       </div>
 
       <div style="margin-top:16px">
-        <select id="homeActivitySelect" class="search-input" style="padding-left:14px; background-color:var(--surface); border-color:var(--line);">
-        </select>
+        <select id="homeActivitySelect" class="search-input" style="padding-left:14px; background-color:var(--surface); border-color:var(--line);"></select>
       </div>
       <div id="customActivityRow" style="margin-top:10px; display:none;">
-        <input id="customActivityInput" class="search-input" placeholder="Describe your custom activity (e.g. Trail run 45 min, 10 kg pack)" style="padding-left:14px; background-color:var(--surface); border-color:var(--line);">
+        <input id="customActivityInput" class="search-input" placeholder="Describe your custom activity" style="padding-left:14px; background-color:var(--surface); border-color:var(--line);" />
       </div>
       <div id="gearRow" style="margin-top:10px; display:none;">
         <select id="homeGearSelect" class="search-input" style="padding-left:14px; background-color:var(--surface); border-color:var(--line);"></select>
@@ -498,6 +477,36 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
         <button class="secondary-btn" id="sugStart">Start this session</button>
       </div>
 
+      <div class="card" id="homeBluetoothCard" style="margin-top:16px; padding:16px; border:1px solid var(--line-strong)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite"></div>
+            <div style="font-size:11px;font-weight:800;letter-spacing:.1em">BLUETOOTH SCAN</div>
+            <div id="homeBluetoothCount" style="font-size:10px;color:var(--dim-2);background:var(--surface-3);padding:2px 8px;border-radius:10px">0 FOUND</div>
+          </div>
+          <button id="homeScanBtn" style="padding:10px 16px;border-radius:20px;background:#C9F24E;color:#0A0C05;border:0;font-weight:800;font-size:11px;cursor:pointer">SCAN FOR DEVICE</button>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;padding-bottom:4px" id="homeScanFilters">
+          <button class="pill on" data-filter="all" style="font-size:10px;padding:6px 12px">All Wear Gear</button>
+          <button class="pill" data-filter="watch" style="font-size:10px;padding:6px 12px">Watches</button>
+          <button class="pill" data-filter="ring" style="font-size:10px;padding:6px 12px">Rings</button>
+          <button class="pill" data-filter="strap" style="font-size:10px;padding:6px 12px">Strap</button>
+          <button class="pill" data-filter="chest" style="font-size:10px;padding:6px 12px">Chest</button>
+          <button class="pill" data-filter="connected" style="font-size:10px;padding:6px 12px">Phone-Connected</button>
+        </div>
+        <div id="homeDeviceList" style="max-height:280px;overflow-y:auto">
+          <div style="padding:20px;text-align:center;color:var(--dim);font-size:12px;line-height:1.6">
+            <div style="font-size:24px;margin-bottom:8px">⌚📱💍</div>
+            <div style="font-weight:600">No wear gear found yet</div>
+            <div style="font-size:11px;color:var(--dim-2);margin-top:6px">Tap SCAN FOR DEVICE to find: Apple Watch, Galaxy Watch, Garmin, Polar, Fitbit, Oura Ring, Whoop, Chest Straps<br><br>iPhone users: use <b>Import Apple Health</b> below.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="homeShareBtn" style="flex:1;padding:12px;border-radius:12px;background:var(--surface-3);color:var(--text);border:1px solid var(--line);font-weight:600;font-size:11px;cursor:pointer">SHARE DEVICE</button>
+          <button id="homePhoneSyncBtn" style="flex:1;padding:12px;border-radius:12px;background:rgba(201,242,78,.15);color:#C9F24E;border:1px solid #C9F24E;font-weight:700;font-size:11px;cursor:pointer">IMPORT APPLE HEALTH</button>
+        </div>
+        <div id="homeBluetoothStatus" style="font-size:10px;color:var(--dim-2);margin-top:8px;text-align:center;min-height:14px">Detecting Bluetooth…</div>
+      </div>
       <div class="section-head"><span>NEARBY ACTIVITY</span><a class="link" data-goto="live">View map</a></div>
       <div class="live-strip" id="liveStrip"></div>
     </section>
@@ -509,9 +518,7 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       </header>
       <div class="hero" style="padding-bottom:16px">
         <h1 class="hero-title" style="font-size:24px">Built around you.</h1>
-        <div class="readiness-copy" style="text-align:left;margin-top:8px;max-width:none">
-          Sessions are filtered by your movement profile. Swap any exercise mid-set.
-        </div>
+        <div class="readiness-copy" style="text-align:left;margin-top:8px;max-width:none">Sessions are filtered by your movement profile. Swap any exercise mid-set.</div>
       </div>
       <div class="filter-row" id="trainFilters">
         <button class="pill on" data-f="all">All</button>
@@ -532,24 +539,20 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
         <h1 class="hero-title" style="font-size:24px">Activities, right now.</h1>
       </div>
 
-      <div class="map-wrap" id="mapWrap" style="position: relative;"><input id="liveSearch" placeholder="Search activities, routes, parks..." style="position: absolute; top: 12px; left: 12px; right: 12px; z-index: 500; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--line-strong); background: var(--map-chip); backdrop-filter: blur(12px); color: var(--text);">
+      <div class="map-wrap" id="mapWrap">
         <div id="liveMap"></div>
         <div class="map-overlay">
           <div class="map-chip"><span class="live-dot"></span><span id="mapStatus">LOCATING</span></div>
           <div class="map-chip" id="mapRadius">5 KM RADIUS</div>
         </div>
         <button class="map-expand-btn" id="expandMapBtn">⛶</button>
-        
         <div class="fullscreen-ui">
           <div class="fs-top">
             <button id="closeFsMap" class="fs-close">✕</button>
             <div class="fs-dropdown">
               <span style="color:var(--accent); margin-right:8px;">🥾</span>
               <select id="fsActivitySelect">
-                <option>Hike</option>
-                <option>Run</option>
-                <option>Trail run</option>
-                <option>Walk</option>
+                <option>Hike</option><option>Run</option><option>Trail run</option><option>Walk</option>
               </select>
             </div>
             <button class="fs-save">🔖 Saved</button>
@@ -578,16 +581,13 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
           <div class="profile-sub" id="profileSub">Seated profile · Knee-safe <span class="plan-badge">PREMIUM</span></div>
         </div>
       </div>
-
       <div class="stat-grid">
         <div class="stat-card"><div class="stat-val num">14</div><div class="stat-key">SESSIONS</div><div class="stat-sub">This month</div></div>
         <div class="stat-card"><div class="stat-val num">86<span>km</span></div><div class="stat-key">DISTANCE</div><div class="stat-sub">This month</div></div>
         <div class="stat-card"><div class="stat-val num">12</div><div class="stat-key">STREAK</div><div class="stat-sub">Days</div></div>
       </div>
-
       <div class="section-head"><span>HEALTH PROFILE</span><a class="link" id="editHealth">Edit</a></div>
       <div class="card" style="padding:6px 18px" id="healthCard"></div>
-
       <div class="section-head"><span>RECENT SESSIONS</span></div>
       <div id="recentSessions"></div>
     </section>
@@ -606,20 +606,14 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       </div>
 
       <div class="section-head" style="margin-top:4px"><span>ACTIVITY OPTIONS</span></div>
-
       <div class="card">
         <div class="mr-name">Movement profile</div>
-        <div class="readiness-copy" style="text-align:left;max-width:none;margin-top:6px;font-size:12px">
-          Tap to toggle. Every session is filtered against these constraints.
-        </div>
+        <div class="readiness-copy" style="text-align:left;max-width:none;margin-top:6px;font-size:12px">Tap to toggle. Every session is filtered against these constraints.</div>
         <div class="constraint-row" id="menuConstraints"></div>
       </div>
-
       <div class="card" style="margin-top:10px">
         <div class="mr-name">Energy today</div>
-        <div class="readiness-copy" style="text-align:left;max-width:none;margin-top:6px;font-size:12px">
-          Adjust available energy. The engine rebuilds today's recommendation.
-        </div>
+        <div class="readiness-copy" style="text-align:left;max-width:none;margin-top:6px;font-size:12px">Adjust available energy. The engine rebuilds today's recommendation.</div>
         <div class="spoon-row">
           <input type="range" id="menuEnergyRange" min="0" max="100" value="80">
           <div class="spoon-val num" id="menuEnergyVal">80</div>
@@ -638,14 +632,14 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
         <div class="menu-row">
           <div class="mr-icon">⌖</div>
           <div class="mr-main">
-            <div class="mr-name">Hide route start &amp; end</div>
+            <div class="mr-name">Hide route start & end</div>
             <div class="mr-meta">Privacy zone around home</div>
           </div>
           <div class="toggle on" id="menuPrivacy"></div>
         </div>
       </div>
 
-      <div class="section-head"><span>HEALTH &amp; PERMISSIONS</span></div>
+      <div class="section-head"><span>HEALTH & PERMISSIONS</span></div>
       <div class="card" style="padding:4px 18px">
         <div class="menu-row" id="menuHealthProfile">
           <div class="mr-icon">♥</div>
@@ -658,8 +652,8 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
         <div class="menu-row" id="menuHealthData">
           <div class="mr-icon">✚</div>
           <div class="mr-main">
-            <div class="mr-name">Health &amp; Fitness data</div>
-            <div class="mr-meta" id="menuHealthDataMeta">Not connected</div>
+            <div class="mr-name">Import Apple Health data</div>
+            <div class="mr-meta" id="menuHealthDataMeta">Tap to import export.zip</div>
           </div>
           <div class="mr-arrow">›</div>
         </div>
@@ -674,11 +668,10 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       </div>
 
       <div class="section-head"><span>CONNECTION SETTINGS</span><span class="badge-adaptive" id="menuDevCount">0 ACTIVE</span></div>
-
       <div class="card" style="padding:14px">
         <div class="search-wrap">
           <span class="search-icon">⌕</span>
-          <input class="search-input" id="deviceSearch" placeholder="Search brands or devices...">
+          <input class="search-input" id="deviceSearch" placeholder="Search brands or devices..." />
         </div>
         <div class="filter-row" id="deviceCategories">
           <button class="pill on" data-cat="all">All</button>
@@ -692,41 +685,20 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
           <button class="pill" data-cat="helmet">Helmets</button>
         </div>
       </div>
-
       <div id="deviceList" style="margin-top:10px"></div>
 
       <div class="card" style="margin-top:10px">
         <div class="mr-name">Can't find your device?</div>
-        <div class="readiness-copy" style="text-align:left;max-width:none;margin-top:6px;font-size:12px">
-          Any device that writes to Apple Health or Health Connect is supported automatically. You can also import FIT, GPX, TCX or SRT activity files.
-        </div>
+        <div class="readiness-copy" style="text-align:left;max-width:none;margin-top:6px;font-size:12px">Any device that writes to Apple Health or Health Connect is supported automatically.</div>
         <button class="secondary-btn" style="margin-top:12px" id="importFileBtn">Import activity file</button>
       </div>
 
       <div class="section-head"><span>APPEARANCE</span></div>
       <div class="card" style="padding:4px 18px">
         <div class="theme-list" id="themeList">
-          <div class="theme-item on" data-theme-mode="auto">
-            <div class="theme-radio"></div>
-            <div class="theme-main">
-              <div class="theme-name">Phone default</div>
-              <div class="theme-desc">Follows your phone's appearance</div>
-            </div>
-          </div>
-          <div class="theme-item" data-theme-mode="light">
-            <div class="theme-radio"></div>
-            <div class="theme-main">
-              <div class="theme-name">Light</div>
-              <div class="theme-desc">Always use the light interface</div>
-            </div>
-          </div>
-          <div class="theme-item" data-theme-mode="dark">
-            <div class="theme-radio"></div>
-            <div class="theme-main">
-              <div class="theme-name">Dark</div>
-              <div class="theme-desc">Always use the dark interface</div>
-            </div>
-          </div>
+          <div class="theme-item" data-theme-mode="auto"><div class="theme-radio"></div><div class="theme-main"><div class="theme-name">Phone default</div><div class="theme-desc">Follows your phone's appearance</div></div></div>
+          <div class="theme-item" data-theme-mode="light"><div class="theme-radio"></div><div class="theme-main"><div class="theme-name">Light</div><div class="theme-desc">Always use the light interface</div></div></div>
+          <div class="theme-item" data-theme-mode="dark"><div class="theme-radio"></div><div class="theme-main"><div class="theme-name">Dark</div><div class="theme-desc">Always use the dark interface</div></div></div>
         </div>
       </div>
 
@@ -746,38 +718,26 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
         </div>
       </div>
 
-      <div class="section-head"><span>APP &amp; DATA</span><span class="badge-adaptive" id="pwaStatusBadge">PWA</span></div>
+      <div class="section-head"><span>APP & DATA</span><span class="badge-adaptive" id="pwaStatusBadge">PWA</span></div>
       <div class="card" style="padding:4px 18px">
         <div class="menu-row" id="menuInstall">
           <div class="mr-icon">⬇</div>
-          <div class="mr-main">
-            <div class="mr-name">Install KEEL</div>
-            <div class="mr-meta" id="installMeta">Add to your home screen</div>
-          </div>
+          <div class="mr-main"><div class="mr-name">Install KEEL</div><div class="mr-meta" id="installMeta">Add to your home screen</div></div>
           <div class="mr-arrow">›</div>
         </div>
         <div class="menu-row">
           <div class="mr-icon">◐</div>
-          <div class="mr-main">
-            <div class="mr-name">Connection</div>
-            <div class="mr-meta" id="offlineMeta">Checking…</div>
-          </div>
+          <div class="mr-main"><div class="mr-name">Connection</div><div class="mr-meta" id="offlineMeta">Checking…</div></div>
           <div class="status" id="offlineStatus"><span class="s-dot"></span>Online</div>
         </div>
         <div class="menu-row" id="menuExportData">
           <div class="mr-icon">↗</div>
-          <div class="mr-main">
-            <div class="mr-name">Export data</div>
-            <div class="mr-meta">Download a JSON copy</div>
-          </div>
+          <div class="mr-main"><div class="mr-name">Export data</div><div class="mr-meta">Download a JSON copy</div></div>
           <div class="mr-arrow">›</div>
         </div>
         <div class="menu-row" id="menuClearData">
           <div class="mr-icon">⌫</div>
-          <div class="mr-main">
-            <div class="mr-name">Clear local data</div>
-            <div class="mr-meta">Reset profile and settings</div>
-          </div>
+          <div class="mr-main"><div class="mr-name">Clear local data</div><div class="mr-meta">Reset profile and settings</div></div>
           <div class="mr-arrow">›</div>
         </div>
       </div>
@@ -786,21 +746,19 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       <div class="card" style="padding:4px 18px">
         <div class="menu-row"><div class="mr-main"><div class="mr-name">Subscription</div><div class="mr-meta">Keel Premium · Annual</div></div><div class="mr-arrow">›</div></div>
         <div class="menu-row"><div class="mr-main"><div class="mr-name">Units</div><div class="mr-meta">Metric (km, kg)</div></div><div class="mr-arrow">›</div></div>
-        <div class="menu-row"><div class="mr-main"><div class="mr-name">Data &amp; privacy</div><div class="mr-meta">Export or delete your data</div></div><div class="mr-arrow">›</div></div>
+        <div class="menu-row"><div class="mr-main"><div class="mr-name">Data & privacy</div><div class="mr-meta">Export or delete your data</div></div><div class="mr-arrow">›</div></div>
+        <div class="menu-row" id="menuSignOut"><div class="mr-main"><div class="mr-name" style="color:var(--live)">Sign out</div><div class="mr-meta">End your session on this device</div></div><div class="mr-arrow">›</div></div>
       </div>
 
       <div class="section-head"><span>ABOUT</span></div>
       <div class="card" style="padding:4px 18px">
         <div class="menu-row" id="menuInformation">
           <div class="mr-icon">ⓘ</div>
-          <div class="mr-main">
-            <div class="mr-name">Information</div>
-            <div class="mr-meta">About KEEL, version, credits, privacy</div>
-          </div>
+          <div class="mr-main"><div class="mr-name">Information</div><div class="mr-meta">About KEEL, version, credits, privacy</div></div>
           <div class="mr-arrow">›</div>
         </div>
-        <div class="menu-row"><div class="mr-main"><div class="mr-name">Help &amp; support</div></div><div class="mr-arrow">›</div></div>
-        <div class="menu-row"><div class="mr-main"><div class="mr-name">Version</div></div><div class="mr-meta" id="versionMeta">1.4.1 (build 72)</div></div>
+        <div class="menu-row"><div class="mr-main"><div class="mr-name">Help & support</div></div><div class="mr-arrow">›</div></div>
+        <div class="menu-row"><div class="mr-main"><div class="mr-name">Version</div></div><div class="mr-meta" id="versionMeta">3.0.0 (build 100)</div></div>
       </div>
 
       <div class="menu-footer">KEEL · STEADY BY DESIGN</div>
@@ -808,23 +766,16 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
   </div>
 
   <nav class="nav">
-    <button class="nav-btn active" data-tab="home">
-      <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"></path></svg>Home</button>
-    <button class="nav-btn" data-tab="train">
-      <svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-7 5 14L17 12h4"></path></svg>Train</button>
-    <button class="nav-btn" data-tab="live">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"></circle><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 16.5a6.4 6.4 0 0 0 0-9M4.8 4.8a10.2 10.2 0 0 0 0 14.4M19.2 19.2a10.2 10.2 0 0 0 0-14.4"></path></svg>Live</button>
-    <button class="nav-btn" data-tab="you">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"></circle><path d="M4.5 20c1.2-3.6 4-5.4 7.5-5.4s6.3 1.8 7.5 5.4"></path></svg>You</button>
-    <button class="nav-btn" data-tab="menu">
-      <svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>Menu</button>
+    <button class="nav-btn active" data-tab="home"><svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>Home</button>
+    <button class="nav-btn" data-tab="train"><svg viewBox="0 0 24 24"><path d="M3 12h4l2.5-7 5 14L17 12h4"/></svg>Train</button>
+    <button class="nav-btn" data-tab="live"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M7.5 7.5a6.4 6.4 0 0 0 0 9M16.5 16.5a6.4 6.4 0 0 0 0-9M4.8 4.8a10.2 10.2 0 0 0 0 14.4M19.2 19.2a10.2 10.2 0 0 0 0-14.4"/></svg>Live</button>
+    <button class="nav-btn" data-tab="you"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c1.2-3.6 4-5.4 7.5-5.4s6.3 1.8 7.5 5.4"/></svg>You</button>
+    <button class="nav-btn" data-tab="menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menu</button>
   </nav>
 
   <div class="install-prompt" id="installPrompt">
     <div class="install-prompt-row">
-      <div class="install-icon-img">
-        <img src="icon-192.png" alt="KEEL">
-      </div>
+      <div class="install-icon-img"><img src="icon-192.png" alt="KEEL" /></div>
       <div class="install-text">
         <div class="install-title">Add KEEL to your Home Screen</div>
         <div class="install-sub">Instant access · full-screen · works offline.</div>
@@ -834,10 +785,7 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       <button class="install-btn-primary" id="installPromptBtn">Install</button>
       <button class="install-btn-icon" id="installPromptClose" aria-label="Dismiss">✕</button>
     </div>
-    <label class="install-dontask">
-      <input type="checkbox" id="installPromptDontAsk">
-      <span>Don't show this again</span>
-    </label>
+    <label class="install-dontask"><input type="checkbox" id="installPromptDontAsk" /><span>Don't show this again</span></label>
   </div>
 
   <div class="session-overlay" id="sessionOverlay">
@@ -848,7 +796,7 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       </div>
       <button class="ghost-btn" id="sesBroadcast">PRIVATE</button>
     </div>
-    <canvas id="sessionCanvas" class="session-map" width="744" height="862"></canvas>
+    <canvas id="sessionCanvas" class="session-map"></canvas>
     <div class="session-grid">
       <div class="sg"><div class="sg-val num" id="sesHr">—</div><div class="sg-key">BPM</div></div>
       <div class="sg"><div class="sg-val num" id="sesPace">—</div><div class="sg-key">PACE</div></div>
@@ -867,13 +815,11 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       <div class="brand-main">KEEL</div>
       <div class="brand-tag">Steady by design</div>
     </div>
-
     <div class="hero-eyebrow">REQUIRED TO MONITOR YOUR HEALTH</div>
     <h1 class="hero-title">Your health profile</h1>
     <div class="readiness-copy" style="text-align:left;max-width:none;margin:10px 0 18px;font-size:13px">
       Keel needs these details to keep exercise safe and to adapt intensity in real time. Your data is uploaded only to your private Keel database and is never shared with other apps.
     </div>
-
     <div style="margin-bottom:20px">
       <div class="req-item"><b>1</b> Full name &amp; date of birth</div>
       <div class="req-item"><b>2</b> Biological sex</div>
@@ -883,26 +829,20 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       <div class="req-item"><b>6</b> Emergency contact</div>
       <div class="req-item"><b>7</b> Consent to sensor &amp; location access</div>
     </div>
-
-    <div class="field"><label>FULL NAME</label><input id="obName" autocomplete="name" placeholder="Ari Rahman"></div>
+    <div class="field"><label>FULL NAME</label><input id="obName" autocomplete="name" placeholder="Ari Rahman" /></div>
     <div class="field-row">
-      <div class="field"><label>DATE OF BIRTH</label><input type="date" id="obDob"></div>
+      <div class="field"><label>DATE OF BIRTH</label><input type="date" id="obDob" /></div>
       <div class="field"><label>SEX</label>
-        <select id="obSex">
-          <option value="">Select</option>
-          <option value="female">Female</option>
-          <option value="male">Male</option>
-          <option value="na">Prefer not to say</option>
-        </select>
+        <select id="obSex"><option value="">Select</option><option value="female">Female</option><option value="male">Male</option><option value="na">Prefer not to say</option></select>
       </div>
     </div>
     <div class="field-row">
-      <div class="field"><label>HEIGHT (CM)</label><input type="number" id="obHeight" inputmode="numeric" placeholder="178"></div>
-      <div class="field"><label>WEIGHT (KG)</label><input type="number" id="obWeight" inputmode="decimal" placeholder="74"></div>
+      <div class="field"><label>HEIGHT (CM)</label><input type="number" id="obHeight" inputmode="numeric" placeholder="178" /></div>
+      <div class="field"><label>WEIGHT (KG)</label><input type="number" id="obWeight" inputmode="decimal" placeholder="74" /></div>
     </div>
     <div class="field-row">
-      <div class="field"><label>RESTING HR (BPM)</label><input type="number" id="obRestHr" inputmode="numeric" placeholder="52"></div>
-      <div class="field"><label>MAX HR (BPM)</label><input type="number" id="obMaxHr" inputmode="numeric" placeholder="188"></div>
+      <div class="field"><label>RESTING HR (BPM)</label><input type="number" id="obRestHr" inputmode="numeric" placeholder="52" /></div>
+      <div class="field"><label>MAX HR (BPM)</label><input type="number" id="obMaxHr" inputmode="numeric" placeholder="188" /></div>
     </div>
     <div class="field"><label>MOBILITY PROFILE</label>
       <select id="obMobility">
@@ -915,32 +855,21 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
         <option value="other">Other</option>
       </select>
     </div>
-    <div class="field"><label>CONDITIONS / INJURIES (OPTIONAL)</label><input id="obConditions" placeholder="e.g. knee reconstruction, SCI T6"></div>
-    <div class="field"><label>EMERGENCY CONTACT</label><input id="obEmergency" placeholder="Name &amp; phone number"></div>
-
+    <div class="field"><label>CONDITIONS / INJURIES (OPTIONAL)</label><input id="obConditions" placeholder="e.g. knee reconstruction, SCI T6" /></div>
+    <div class="field"><label>EMERGENCY CONTACT</label><input id="obEmergency" placeholder="Name & phone number" /></div>
     <div style="margin-top:18px;margin-bottom:8px" class="hero-eyebrow">CONSENT</div>
     <div class="check-row" data-consent="health">
       <div class="check-box">✓</div>
-      <div class="check-main">
-        <div class="check-name">Health &amp; Fitness data</div>
-        <div class="check-meta">Read heart rate, HRV, SpO₂, sleep and workouts from Apple Health / Health Connect. Uploaded only to your private Keel database — never shared with other apps.</div>
-      </div>
+      <div class="check-main"><div class="check-name">Health & Fitness data</div><div class="check-meta">Read heart rate, HRV, SpO₂, sleep and workouts from Apple Health / Health Connect.</div></div>
     </div>
     <div class="check-row" data-consent="location">
       <div class="check-box">✓</div>
-      <div class="check-main">
-        <div class="check-name">Precise location</div>
-        <div class="check-meta">Used for live maps and to find public activities near you. Never shared without broadcasting.</div>
-      </div>
+      <div class="check-main"><div class="check-name">Precise location</div><div class="check-meta">Used for live maps and to find public activities near you.</div></div>
     </div>
     <div class="check-row" data-consent="motion">
       <div class="check-box">✓</div>
-      <div class="check-main">
-        <div class="check-name">Motion &amp; fitness</div>
-        <div class="check-meta">Steps, cadence and activity recognition for accurate session tracking.</div>
-      </div>
+      <div class="check-main"><div class="check-name">Motion &amp; fitness</div><div class="check-meta">Steps, cadence and activity recognition for accurate session tracking.</div></div>
     </div>
-
     <button class="primary-btn" id="obSubmit">Create profile</button>
   </div>
 
@@ -949,19 +878,10 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       <div class="sheet-grip"></div>
       <div class="hero-eyebrow">PERMISSIONS</div>
       <div class="sheet-name" style="margin-top:6px">Sensor &amp; location access</div>
-      <div class="sheet-note" style="margin-top:8px">
-        Keel only reads the sensors you approve. You can revoke access any time in Menu → App permissions.
-      </div>
-
+      <div class="sheet-note" style="margin-top:8px">Keel only reads the sensors you approve. You can revoke access any time in Menu → App permissions.</div>
       <div id="permRows"></div>
-
       <div class="perm-devices">REQUIRED DEVICES</div>
       <div id="permDevices"></div>
-
-      <div class="sheet-note" style="margin-top:10px">
-        Health &amp; Fitness data from Apple Health (iPhone) or Health Connect (Android) is uploaded to your private Keel database only. It is never shared with other apps or third parties.
-      </div>
-
       <button class="primary-btn" id="permDone">Done</button>
     </div>
   </div>
@@ -971,9 +891,7 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       <div class="sheet-grip"></div>
       <div class="hero-eyebrow">INSTALL KEEL</div>
       <div class="sheet-name" id="installSheetTitle" style="margin-top:6px">Add to Home Screen</div>
-      <div class="sheet-note" style="margin-top:8px">
-        Install KEEL to get instant access, offline support, and a full-screen experience — just like a native app. After installing, KEEL will ask for location access to enable the live map.
-      </div>
+      <div class="sheet-note" style="margin-top:8px">Install KEEL to get instant access, offline support, and a full-screen experience.</div>
       <div id="installSheetBody"></div>
       <button class="primary-btn" id="installSheetAction">Try automatic install</button>
       <button class="secondary-btn" id="installSheetClose" style="margin-top:10px">Close</button>
@@ -985,74 +903,91 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
       <div class="sheet-grip"></div>
       <div class="hero-eyebrow">INFORMATION</div>
       <div class="sheet-name" style="margin-top:6px">About KEEL</div>
-
       <div style="margin-top:16px">
         <div class="info-section">
           <div class="info-title">WHAT IS KEEL</div>
-          <div class="info-body">An adaptive training companion that keeps exercise safe and steady. Sessions are matched to your readiness, movement profile, and daily energy — so you train with intention, not guesswork.</div>
+          <div class="info-body">An adaptive training companion that keeps exercise safe and steady. Sessions are matched to your readiness, movement profile, and daily energy.</div>
         </div>
-
         <div class="info-section">
           <div class="info-title">VERSION &amp; STATUS</div>
-          <div class="info-kv"><span class="k">App version</span><span class="v" id="infoVersion">1.4.1</span></div>
-          <div class="info-kv"><span class="k">Build</span><span class="v" id="infoBuild">72</span></div>
+          <div class="info-kv"><span class="k">App version</span><span class="v" id="infoVersion">3.0.0</span></div>
+          <div class="info-kv"><span class="k">Build</span><span class="v" id="infoBuild">100</span></div>
           <div class="info-kv"><span class="k">Install status</span><span class="v" id="infoInstallStatus">Browser tab</span></div>
         </div>
-
         <div class="info-section">
           <div class="info-title">PRIVACY</div>
           <div class="info-body">Your health profile, health &amp; fitness data and activity data are uploaded only to your private Keel database. They are used solely to adapt your training and are never shared with other apps or third parties.</div>
         </div>
-
         <div class="info-section">
           <div class="info-title">CREDITS</div>
-          <div class="info-body">
-            Maps © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>.<br>
-            Map library: <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>.
-          </div>
+          <div class="info-body">Maps © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors, © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>.<br>Map library: <a href="https://leafletjs.com" target="_blank" rel="noopener">Leaflet</a>.</div>
         </div>
-
         <div class="info-section">
           <div class="info-title">SUPPORT</div>
-          <div class="info-body">
-            Questions or issues?<br>
-            <a href="mailto:support@keel.app">support@keel.app</a>
-          </div>
+          <div class="info-body">Questions or issues?<br><a href="mailto:support@keel.app">support@keel.app</a></div>
         </div>
       </div>
-
       <button class="primary-btn" id="infoSheetClose" style="margin-top:16px">Close</button>
     </div>
   </div>
 
-  <div class="login-overlay" id="loginOverlay" data-fixed="1">
-      <div id="realSignupForm" style="width:100%;max-width:360px;margin:auto;padding:24px">
-        <h2 style="font-size:22px;margin:0 0 6px">Create your KEEL account</h2>
-        <p style="font-size:12px;color:var(--dim);margin:0 0 18px">We only use what you type. No hidden extraction from your phone.</p>
-        <input id="suName" placeholder="Full name" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px">
-        <input id="suEmail" type="email" placeholder="Email address" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px">
-        <input id="suPass" type="password" placeholder="Password (min 8 chars)" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px">
-        <input id="suPass2" type="password" placeholder="Confirm password" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:14px">
-        <label style="display:flex;gap:8px;font-size:11px;color:var(--dim);margin-bottom:14px"><input type="checkbox" id="suConsent"> I consent to storing my email/name for login and understand health data is optional and requires separate permission.</label>
-        <button id="suSubmit" style="width:100%;padding:14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Sign Up</button>
-        <div style="text-align:center;margin-top:12px"><button id="suToLogin" style="background:none;border:0;color:var(--dim);font-size:12px">Already have account? Log in</button></div>
-        <div id="suError" style="color:var(--live);font-size:11px;margin-top:10px;display:none"></div>
+  <div class="perm-overlay" id="healthImportSheet">
+    <div class="perm-card">
+      <div class="sheet-grip"></div>
+      <div class="hero-eyebrow">APPLE HEALTH IMPORT</div>
+      <div class="sheet-name" style="margin-top:6px">Import your iPhone Health data</div>
+      <div class="sheet-note" style="margin-top:8px">Web apps cannot read HealthKit directly. Export from the Health app once, and KEEL will parse HRV, sleep, resting HR, heart rate and steps from that file.</div>
+      <div style="margin:14px 0">
+        <div class="install-step"><div class="install-step-num">1</div><div>Open <b>Health</b> → tap your avatar</div></div>
+        <div class="install-step"><div class="install-step-num">2</div><div>Scroll down → <b>Export All Health Data</b></div></div>
+        <div class="install-step"><div class="install-step-num">3</div><div>Save <b>export.zip</b> to Files</div></div>
+        <div class="install-step"><div class="install-step-num">4</div><div>Return here → tap <b>Choose file</b></div></div>
       </div>
-    <div class="brand-lockup" style="margin-bottom: 30px; align-items: center;">
-      <div class="brand-main" style="font-size: 26px;">KEEL</div>
-      <div class="brand-tag" style="font-size: 11px;">Steady by design</div>
+      <input type="file" id="healthFileInput" accept=".zip,.xml" style="display:none" />
+      <button class="primary-btn" id="healthChooseFile">Choose export.zip</button>
+      <button class="secondary-btn" id="healthImportClose" style="margin-top:10px">Cancel</button>
+      <div id="healthImportStatus" style="margin-top:12px;font-size:11px;color:var(--dim-2);text-align:center;min-height:16px"></div>
     </div>
-    <div class="sheet-note" style="text-align: center; margin-bottom: 20px; font-size:13px; color:var(--dim);">Sign up or log in to sync your health profile<br>and find nearby contacts.</div>
+  </div>
 
-    <button class="login-btn" onclick="handleLogin('Google')">
-      <span style="font-weight:800;color:#DB4437;">G</span> Continue with Google
-    </button>
-    <button class="login-btn" onclick="handleLogin('Apple')">
-      <span style="font-size:18px; transform:translateY(-1px)"></span> Continue with iPhone
-    </button>
-    <button class="login-btn" onclick="handleLogin('Email')">
-      <span style="font-weight:800;color:var(--dim);">@</span> Continue with Email
-    </button>
+  <!-- ============ LOGIN (real auth) ============ -->
+  <div class="login-overlay" id="loginOverlay">
+    <div style="width:100%;max-width:360px;display:flex;flex-direction:column;align-items:center">
+      <div class="brand-lockup" style="margin-bottom:24px;align-items:center">
+        <div class="brand-main" style="font-size:26px">KEEL</div>
+        <div class="brand-tag" style="font-size:11px">Steady by design</div>
+      </div>
+
+      <div class="auth-tabs" id="authTabs">
+        <button class="auth-tab on" data-mode="signin">Sign In</button>
+        <button class="auth-tab" data-mode="signup">Sign Up</button>
+      </div>
+
+      <form id="authForm" style="width:100%">
+        <div class="field" id="authNameRow" style="display:none">
+          <label>FULL NAME</label>
+          <input id="authName" type="text" autocomplete="name" placeholder="Your name" />
+        </div>
+        <div class="field">
+          <label>EMAIL</label>
+          <input id="authEmail" type="email" autocomplete="email" placeholder="you@example.com" required />
+        </div>
+        <div class="field">
+          <label>PASSWORD</label>
+          <input id="authPassword" type="password" autocomplete="current-password" placeholder="At least 8 characters" minlength="8" required />
+        </div>
+        <div class="field" id="authConfirmRow" style="display:none">
+          <label>CONFIRM PASSWORD</label>
+          <input id="authConfirm" type="password" autocomplete="new-password" placeholder="Repeat password" />
+        </div>
+        <div class="auth-error" id="authError"></div>
+        <button type="submit" class="primary-btn" id="authSubmit" style="margin-top:8px">Sign In</button>
+      </form>
+
+      <div class="sheet-note" style="text-align:center;margin-top:16px;font-size:11px;color:var(--dim-2);line-height:1.5">
+        Your health data is stored privately and never shared with other apps.
+      </div>
+    </div>
   </div>
 
   <div class="update-banner" id="updateBanner">
@@ -1066,11 +1001,11 @@ console.log('KEEL: Supabase URL set to https://xljdbzkzslyzonfovkbo.supabase.co'
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 /* ============================================================
-   KEEL — adaptive training prototype v1.4.1
+   KEEL — adaptive training prototype v3.0.0
    ============================================================ */
 
-const APP_VERSION = '1.4.1';
-const BUILD_NUMBER = 72;
+const APP_VERSION = '3.0.0';
+const BUILD_NUMBER = 100;
 const CARTO_API_KEY = 'cb1_4xdx_1_754aa9ca6dab585c002ef6cc';
 
 const INSTALL_DISMISSED_KEY = 'keel-install-dismissed-v1';
@@ -1168,24 +1103,8 @@ function loadProfile(){
   }catch(e){}
 }
 
-function handleLogin(method) {
-  state.isLoggedIn = true;
-  try { localStorage.setItem('keel-logged-in', 'true'); } catch(e){}
-  $('#loginOverlay').classList.remove('on');
-  toast(`Logged in with ${method}`);
-  
-  if (!state.health.completed) {
-    showOnboard();
-  } else {
-    syncHealthData();
-    if (geoSupported() && state.geo.status !== 'granted') requestLocation(false);
-    applyPendingLaunch();
-    renderAll();
-  }
-}
-
 /* ------------------------------------------------------------
-   3. UNIVERSAL DEVICE CATALOG (Defaults to Disconnected)
+   3. DEVICE CATALOG
    ------------------------------------------------------------ */
 const DEVICE_CATALOG = [
   { id:'aw', brand:'Apple', name:'Watch Series 10 / Ultra 2', cat:'watch', protocols:['Health','BLE'], connected:false },
@@ -1219,6 +1138,7 @@ function initLiveMap() {
   if (liveMap) return;
   liveMap = L.map('liveMap', { zoomControl: false, attributionControl: true }).setView([51.505, -0.09], 13);
   updateMapTiles();
+  window.liveMap = liveMap;
 }
 
 function updateMapTiles() {
@@ -1255,7 +1175,6 @@ systemDark.addEventListener('change', () => { if (state.themeMode === 'auto') ap
    ------------------------------------------------------------ */
 function computeReadiness(){
   if(state.hrv === null || state.sleep === null || state.rhr === null) return 0;
-  
   const hrvN   = clamp((state.hrv - 30) / 70, 0, 1);
   const sleepN = clamp((state.sleep - 4) / 5, 0, 1);
   const rhrN   = clamp((70 - state.rhr) / 25, 0, 1);
@@ -1267,7 +1186,7 @@ function readinessCopy(score){
   if (score >= 78) return { label:'PRIMED',  line:'Recovered. A good day to push strength.',            tag:'strength'  };
   if (score >= 60) return { label:'READY',   line:'Steady. Zone 2 or technique work fits well today.',   tag:'endurance' };
   if (score >= 42) return { label:'MODERATE',line:'Moderate reserves. Mobility and light aerobic work.', tag:'mobility'  };
-  if (score === 0) return { label:'SYNCING', line:'Waiting for health data from your phone or wearables...', tag:'recovery' };
+  if (score === 0) return { label:'SYNCING', line:'Waiting for health data. Import Apple Health to begin.', tag:'recovery' };
   return              { label:'RECOVER', line:'Low reserves today. Breathwork and mobility only.',       tag:'recovery'  };
 }
 
@@ -1306,7 +1225,7 @@ function recommendSession(score){
 }
 
 /* ------------------------------------------------------------
-   6b. TRAILS
+   7. GEOLOCATION & TRAILS
    ------------------------------------------------------------ */
 const TRAIL_TEMPLATES = [
   { name:'Riverside Trail Loop',  type:'hike', km:5.2, elevation:42,  surface:'paved', difficulty:'Easy' },
@@ -1319,83 +1238,14 @@ const TRAIL_TEMPLATES = [
 let selectedTrailId = null;
 let trailLayer = null;
 
-/* ------------------------------------------------------------
-   7. GEOLOCATION & TRAILS
-   ------------------------------------------------------------ */
 function geoSupported(){ return !!navigator.geolocation; }
 
-let geoRequestSeq = 0;
-
 function requestLocation(fromPerm){
-  if (!geoSupported()){
-    state.geo.status = 'denied';
-    state.geo.error = 'unsupported';
-    updateGeoUI();
-    if (fromPerm) renderPerms();
-    toast('Geolocation is not supported in this browser');
-    return;
-  }
-
-  if (state.geo.status === 'requesting'){
-    if (fromPerm) renderPerms();
-    return;
-  }
-
-  const seq = ++geoRequestSeq;
-  state.geo.status = 'requesting';
-  state.geo.error = null;
-  updateGeoUI();
-  if (fromPerm) renderPerms();
-  renderHome(); renderLive();
-
-  const fail = (err) => {
-    if (seq !== geoRequestSeq) return;
-    state.geo.status = 'denied';
-    state.geo.error = (err && err.message) || 'Location request timed out';
-    updateGeoUI();
-    renderPerms();
-    renderHome();
-    renderLive();
-    if (fromPerm) toast('Location not available');
-  };
-
-  const success = (pos) => {
-    if (seq !== geoRequestSeq) return;
-    state.geo = {
-      status: 'granted',
-      lat: pos.coords.latitude,
-      lng: pos.coords.longitude,
-      acc: pos.coords.accuracy,
-      error: null
-    };
-    state.consent.location = true;
-    saveProfile();
-
-    if (!liveMap) initLiveMap();
-    liveMap.setView([state.geo.lat, state.geo.lng], 14);
-
-    if (userMarker) liveMap.removeLayer(userMarker);
-    userMarker = L.circleMarker([state.geo.lat, state.geo.lng], {
-      radius: 8, fillColor: '#6FB3FF', color: '#fff', weight: 2, opacity: 1, fillOpacity: 1
-    }).addTo(liveMap);
-
-    updateGeoUI(); renderPerms(); renderHome(); renderLive();
-    startAreaScan();
-  };
-
-  const geoPromise = new Promise((resolve, reject) => {
-    navigator.geolocation.getCurrentPosition(resolve, reject, {
-      enableHighAccuracy: true, 
-      timeout: 10000,
-      maximumAge: 0
-    });
-  });
-
-  const hardTimeout = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error('Location request timed out')), 12000);
-  });
-
-  Promise.race([geoPromise, hardTimeout]).then(success).catch(fail);
+  if (window.KEELGeo) return window.KEELGeo(fromPerm);
+  navigator.geolocation.getCurrentPosition(
+    pos => { state.geo = { status:'granted', lat:pos.coords.latitude, lng:pos.coords.longitude, acc:pos.coords.accuracy, error:null }; updateGeoUI(); renderLive(); },
+    () => { state.geo.status = 'denied'; updateGeoUI(); }
+  );
 }
 
 function startAreaScan(){
@@ -1403,22 +1253,15 @@ function startAreaScan(){
   state.scanning = true;
   state.scanDone = false;
   renderHome(); renderLive();
-
   setTimeout(() => {
     state.scanning = false;
     state.scanDone = true;
-    
     state.trails = TRAIL_TEMPLATES.map((t, i) => {
       const seed = (i + 1) * 1234;
       const dLat = (((seed % 100) / 100) - 0.5) * 0.02;
       const dLng = ((((seed >> 7) % 100) / 100) - 0.5) * 0.03;
-      return Object.assign({}, t, {
-        id: 'trail-' + i,
-        lat: state.geo.lat + dLat,
-        lng: state.geo.lng + dLng
-      });
+      return Object.assign({}, t, { id: 'trail-' + i, lat: state.geo.lat + dLat, lng: state.geo.lng + dLng });
     });
-
     updateLiveMapMarkers();
     renderHome(); renderLive();
   }, 2000);
@@ -1444,34 +1287,23 @@ function updateGeoUI(){
   const radius = $('#mapRadius');
   if (radius) radius.textContent = granted ? '5 KM RADIUS' : 'GPS OFF';
   const st = $('#mapStatus');
-  if (st){
-    st.textContent = state.scanning ? 'SCANNING' : (granted ? 'LIVE MAP' : 'LOCATION OFF');
-  }
+  if (st){ st.textContent = state.scanning ? 'SCANNING' : (granted ? 'LIVE MAP' : 'LOCATION OFF'); }
   updateLiveBadge();
 }
 
 /* ------------------------------------------------------------
-   8. SYNC HEALTH DATA
+   8. SYNC HEALTH DATA — REAL APPLE HEALTH IMPORT
    ------------------------------------------------------------ */
 function syncHealthData() {
-  state.isSyncing = true;
-  renderHome();
-  
+  if (state.healthSync && state.healthSync.source && state.healthSync.source.indexOf('Apple Health (export') === 0) {
+    toast('Apple Health data loaded');
+    return;
+  }
   setTimeout(() => {
-    state.isSyncing = false;
-    state.hrv = 64;
-    state.sleep = 7.7;
-    state.rhr = 52;
-    state.steps = 8240;
-    state.activeMin = 42;
-    state.kcal = 612;
-    state.hr = 68;
-    
-    state.healthSync = { connected: true, lastSync: Date.now(), source: detectPlatform().isIOS ? 'Apple Health' : 'Health Connect' };
-    saveProfile();
-    renderAll();
-    toast('Health data synced successfully');
-  }, 2500);
+    const sheet = document.getElementById('healthImportSheet');
+    if (sheet) sheet.classList.add('on');
+    else toast('Tap "Import Apple Health data" in the Menu to load your data');
+  }, 600);
 }
 
 /* ------------------------------------------------------------
@@ -1484,10 +1316,7 @@ function permMeta(kind){
   if (kind === 'location'){
     if (state.geo.status === 'granted') return `Granted · ±${Math.round(state.geo.acc||0)} m accuracy`;
     if (state.geo.status === 'requesting') return 'Waiting for system prompt…';
-    if (state.geo.status === 'denied'){
-      if (state.geo.error === 'unsupported') return 'Geolocation is not supported in this browser';
-      return 'Denied — enable in device settings';
-    }
+    if (state.geo.status === 'denied') return 'Denied — enable in device settings';
     return 'Needed for live maps and nearby activities';
   }
   if (kind === 'health') return state.consent.health ? 'Granted · HR, HRV, SpO₂, sleep' : 'Needed to monitor exercise safety';
@@ -1500,6 +1329,14 @@ function permMeta(kind){
     return 'Import from Apple Health / Health Connect — private to Keel';
   }
   return '';
+}
+
+async function logConsent(permission) {
+  try {
+    if (window.supabaseAuth?.logHealthConsent) {
+      await window.supabaseAuth.logHealthConsent(permission, 'permissions_sheet');
+    }
+  } catch(e) { console.warn('[KEEL] consent log:', e.message); }
 }
 
 function renderPerms(){
@@ -1529,11 +1366,12 @@ function renderPerms(){
     b.addEventListener('click', () => {
       const k = b.dataset.perm;
       if (k === 'location') requestLocation(true);
-      else if (k === 'fitness') syncHealthData();
+      else if (k === 'fitness') { document.getElementById('healthImportSheet')?.classList.add('on'); }
       else {
         setTimeout(() => {
           state.consent[k] = true; saveProfile();
           renderPerms(); renderMenu();
+          logConsent(k);
           toast(`${k} access granted`);
         }, 500);
       }
@@ -1544,13 +1382,10 @@ function renderPerms(){
   $('#permDevices').innerHTML = devices.length
     ? devices.map(d => `<div class="perm-row" style="padding:10px 0">
         <div class="perm-icon">✓</div>
-        <div class="perm-main">
-          <div class="perm-name">${d.brand} ${d.name}</div>
-          <div class="perm-meta">${d.protocols.join(' · ')}</div>
-        </div>
+        <div class="perm-main"><div class="perm-name">${d.brand} ${d.name}</div><div class="perm-meta">${d.protocols.join(' · ')}</div></div>
         <span class="badge-adaptive">SENSOR</span>
       </div>`).join('')
-    : `<div class="sheet-note">No devices connected yet. Add them from Menu → Connection settings.</div>`;
+    : `<div class="sheet-note">No devices connected yet. Add them from Menu → Connection settings, or import Apple Health.</div>`;
 }
 
 /* ------------------------------------------------------------
@@ -1581,16 +1416,8 @@ function submitOnboard(){
   const height = $('#obHeight').value.trim();
   const weight = $('#obWeight').value.trim();
   const restHr = $('#obRestHr').value.trim();
-
-  if (!name || !dob || !height || !weight || !restHr){
-    toast('Complete the required fields');
-    return;
-  }
-  if (!onboardConsent.health || !onboardConsent.location){
-    toast('Health and location consent are required');
-    return;
-  }
-
+  if (!name || !dob || !height || !weight || !restHr){ toast('Complete the required fields'); return; }
+  if (!onboardConsent.health || !onboardConsent.location){ toast('Health and location consent are required'); return; }
   state.health = {
     name, dob, sex: $('#obSex').value, height, weight,
     restHr, maxHr: $('#obMaxHr').value.trim(),
@@ -1601,15 +1428,21 @@ function submitOnboard(){
   };
   state.consent.health = !!onboardConsent.health;
   state.consent.motion = !!onboardConsent.motion;
-
   const m = state.health.mobility;
   state.profile.seated = (m === 'seated' || m === 'handcycle' || m === 'recumbent');
+  state.isLoggedIn = true;
+  state.consent.location = !!onboardConsent.location;
   saveProfile();
-
+  try{ localStorage.setItem('keel-logged-in', 'true'); }catch(e){}
+  try{ localStorage.setItem('keel-user-name', state.health.name); }catch(e){}
   hideOnboard();
   renderAll();
+  toast('Welcome '+state.health.name.split(' ')[0]+'! Profile created');
+  if (onboardConsent.health) logConsent('health');
+  if (onboardConsent.location) logConsent('location');
+  if (onboardConsent.motion) logConsent('motion');
   openPermissions();
-  requestLocation(true);
+  if (geoSupported()) requestLocation(true);
   if (onboardConsent.health) syncHealthData();
   applyPendingLaunch();
 }
@@ -1685,9 +1518,7 @@ function drawSessionMap(){
   if (!fit || !state.session) return;
   const { ctx, w, h } = fit;
   const s = state.session;
-
   drawMapBase(ctx, w, h);
-
   if (s.trail.length > 1){
     ctx.beginPath();
     s.trail.forEach((p,i) => {
@@ -1698,7 +1529,6 @@ function drawSessionMap(){
     ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     ctx.stroke();
   }
-
   const cx = w/2 + (s.x - .5) * 20;
   const cy = h/2 + (s.y - .5) * 20;
   if (state.geo.status === 'granted'){
@@ -1716,60 +1546,60 @@ function drawSessionMap(){
    ------------------------------------------------------------ */
 function liveStripHTML(){
   if (state.scanning){
-    return `<div class="live-mini"><span class="scan-dot"></span><div>
-      <div class="lm-name">Scanning your area…</div>
-      <div class="lm-act">Searching platforms…</div></div></div>`;
+    return `<div class="live-mini"><span class="scan-dot"></span><div><div class="lm-name">Scanning your area…</div><div class="lm-act">Searching platforms…</div></div></div>`;
   }
   if (state.geo.status !== 'granted'){
-    return `<div class="live-mini" data-goto="live"><span class="lm-dot" style="color:var(--dim-2);background:var(--dim-2)"></span><div>
-      <div class="lm-name">Location is off</div>
-      <div class="lm-act">Tap to enable GPS</div></div></div>`;
+    return `<div class="live-mini" data-goto="live"><span class="lm-dot" style="color:var(--dim-2);background:var(--dim-2)"></span><div><div class="lm-name">Location is off</div><div class="lm-act">Tap to enable GPS</div></div></div>`;
   }
   if (!state.trails.length){
-    return `<div class="live-mini" data-goto="live"><span class="lm-dot" style="color:var(--dim-2);background:var(--dim-2)"></span><div>
-      <div class="lm-name">No trails found</div>
-      <div class="lm-act">Check back later</div></div></div>`;
+    return `<div class="live-mini" data-goto="live"><span class="lm-dot" style="color:var(--dim-2);background:var(--dim-2)"></span><div><div class="lm-name">No trails found</div><div class="lm-act">Check back later</div></div></div>`;
   }
   return state.trails.slice(0,3).map(a => `
     <div class="live-mini" data-goto="live">
       <span class="lm-dot" style="color:var(--blue);background:var(--blue)"></span>
-      <div><div class="lm-name">${a.name}</div>
-      <div class="lm-act">${a.type === 'run' ? 'Running' : 'Hiking'} · ${a.km.toFixed(1)} km</div></div>
+      <div><div class="lm-name">${a.name}</div><div class="lm-act">${a.type === 'run' ? 'Running' : 'Hiking'} · ${a.km.toFixed(1)} km</div></div>
     </div>`).join('');
+}
+
+function renderActivitySelect(){
+  const sel = $('#homeActivitySelect');
+  if (!sel) return;
+  const options = [
+    { v:'', t:'Choose an activity…' },
+    { v:'act-run', t:'▷  Run' },
+    { v:'act-cycle', t:'◈  Cycle' },
+    { v:'act-weights', t:'▤  Weights' },
+    { v:'act-hike', t:'◎  Hike' },
+    { v:'act-custom', t:'✎  Custom activity…' }
+  ];
+  const html = options.map(o => `<option value="${o.v}">${o.t}</option>`).join('');
+  if (sel.innerHTML !== html) sel.innerHTML = html;
 }
 
 function renderHome(){
   const score = computeReadiness();
   const copy  = readinessCopy(score);
-
   const C = 2 * Math.PI * 58;
   const ring = $('#ringFg');
   ring.style.strokeDasharray  = C;
   ring.style.strokeDashoffset = C - (score/100) * C;
-
-  $('#readinessScore').textContent = state.isSyncing ? '--' : score;
-  $('#readinessLabel').textContent = state.isSyncing ? 'SYNCING' : copy.label;
-  $('#readinessCopy').textContent  = state.isSyncing ? 'Connecting to Apple Health...' : copy.line;
-
+  $('#readinessScore').textContent = score;
+  $('#readinessLabel').textContent = copy.label;
+  $('#readinessCopy').textContent  = copy.line;
   $('#mHrv').innerHTML   = state.hrv === null ? '--<span>ms</span>' : Math.round(state.hrv) + '<span>ms</span>';
   $('#mSleep').innerHTML = state.sleep === null ? '--<span>h</span>' : state.sleep.toFixed(1) + '<span>h</span>';
   $('#mRhr').innerHTML   = state.rhr === null ? '--<span>bpm</span>' : Math.round(state.rhr) + '<span>bpm</span>';
-
   $('#cSteps').textContent  = Math.round(state.steps).toLocaleString();
   $('#cActive').innerHTML   = Math.round(state.activeMin) + '<span>m</span>';
   $('#cKcal').textContent   = Math.round(state.kcal);
   $('#hrPillVal').textContent = state.hr ? Math.round(state.hr) : '--';
-
   renderActivitySelect();
-
   const s = recommendSession(score);
   $('#sugName').textContent = s.name;
   $('#sugMeta').textContent = `${s.dur} min · ${s.intensity} · ${s.kcal} kcal`;
   $('#sugTags').innerHTML = s.tags.map(t =>
     `<span class="tag ${t==='seated'||t==='wheelchair'?'hot':''}">${t}</span>`).join('');
-
   $('#liveStrip').innerHTML = liveStripHTML();
-
   if (state.isLoggedIn && state.health.name){
     const first = state.health.name.split(' ')[0];
     const hour = new Date().getHours();
@@ -1796,13 +1626,9 @@ function renderTrain(){
   $('#trainList').innerHTML = list.map(s => `
     <div class="list-card" data-id="${s.id}">
       <div class="lc-icon">${s.icon}</div>
-      <div class="lc-main">
-        <div class="lc-name">${s.name}</div>
-        <div class="lc-meta">${s.dur} min · ${s.intensity} · ${s.kcal} kcal</div>
-      </div>
+      <div class="lc-main"><div class="lc-name">${s.name}</div><div class="lc-meta">${s.dur} min · ${s.intensity} · ${s.kcal} kcal</div></div>
       <div class="lc-arrow">›</div>
     </div>`).join('') || `<div class="sheet-note">No sessions match this filter.</div>`;
-
   const excluded = LIBRARY.length - LIBRARY.filter(sessionAllowed).length;
   $('#profileBadge').textContent = excluded > 0 ? `${excluded} EXCLUDED` : 'ADAPTED';
 }
@@ -1813,44 +1639,25 @@ function renderTrain(){
 function renderTrails(){
   const el = $('#trailsList');
   if (!el) return;
-
   if (state.geo.status === 'requesting'){
-    el.innerHTML = `<div class="status-card">
-      <div class="sc-title">Locating trails...</div>
-      <div class="sc-sub">Waiting for location prompt…</div>
-    </div>`;
+    el.innerHTML = `<div class="status-card"><div class="sc-title">Locating trails...</div><div class="sc-sub">Waiting for location prompt…</div></div>`;
     return;
   }
   if (state.geo.status !== 'granted'){
-    el.innerHTML = `<div class="status-card">
-      <div class="sc-title">Enable location for trails</div>
-      <div class="sc-sub">Running and hiking trails near you appear here once location is on.</div>
-      <button class="sc-action" id="enableTrailLocBtn">Enable location</button>
-    </div>`;
+    el.innerHTML = `<div class="status-card"><div class="sc-title">Enable location for trails</div><div class="sc-sub">Running and hiking trails near you appear here once location is on.</div><button class="sc-action" id="enableTrailLocBtn">Enable location</button></div>`;
     const btn = $('#enableTrailLocBtn');
     if (btn) btn.addEventListener('click', () => requestLocation(true));
     return;
   }
-
-  if (!state.trails.length){
-    el.innerHTML = `<div class="sheet-note">No trails found nearby.</div>`;
-    return;
-  }
-
+  if (!state.trails.length){ el.innerHTML = `<div class="sheet-note">No trails found nearby.</div>`; return; }
   el.innerHTML = state.trails.map(t => {
     const selected = selectedTrailId === t.id;
     return `<div class="list-card" data-trail="${t.id}" style="${selected ? 'border-color:var(--accent);background:var(--accent-dim)' : ''}">
       <div class="lc-icon">${t.type === 'run' ? '▷' : '◎'}</div>
-      <div class="lc-main">
-        <div class="lc-name">${t.name}</div>
-        <div class="lc-meta">${t.km.toFixed(1)} km · ${t.type === 'run' ? 'Running' : 'Hiking'} · ${t.surface} · ${t.elevation}m · ${t.difficulty}</div>
-      </div>
-      ${selected
-        ? `<button class="perm-btn granted" data-trail-start="${t.id}">START</button>`
-        : `<div class="lc-arrow">›</div>`}
+      <div class="lc-main"><div class="lc-name">${t.name}</div><div class="lc-meta">${t.km.toFixed(1)} km · ${t.type === 'run' ? 'Running' : 'Hiking'} · ${t.surface} · ${t.elevation}m · ${t.difficulty}</div></div>
+      ${selected ? `<button class="perm-btn granted" data-trail-start="${t.id}">START</button>` : `<div class="lc-arrow">›</div>`}
     </div>`;
   }).join('');
-
   el.querySelectorAll('[data-trail]').forEach(card => {
     card.addEventListener('click', e => {
       if (e.target.closest('[data-trail-start]')) return;
@@ -1858,10 +1665,7 @@ function renderTrails(){
     });
   });
   el.querySelectorAll('[data-trail-start]').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      startTrailSession(btn.dataset.trailStart);
-    });
+    btn.addEventListener('click', e => { e.stopPropagation(); startTrailSession(btn.dataset.trailStart); });
   });
 }
 
@@ -1891,18 +1695,9 @@ function startTrailSession(trailId){
   selectedTrailId = null;
   if (trailLayer && liveMap){ liveMap.removeLayer(trailLayer); trailLayer = null; }
   tryStart({
-    id: 'trail-' + t.id,
-    name: t.name,
-    type: 'endurance',
-    intensity: 'Moderate',
-    kcal: 0,
-    tags: [],
-    icon: t.type === 'run' ? '▷' : '◎',
-    isPrimary: true,
-    primaryId: t.type === 'run' ? 'run' : 'hike',
-    gear: null,
-    speed: t.type === 'run' ? 10.5 : 5.5,
-    pace: true
+    id: 'trail-' + t.id, name: t.name, type: 'endurance', intensity: 'Moderate', kcal: 0, tags: [],
+    icon: t.type === 'run' ? '▷' : '◎', isPrimary: true, primaryId: t.type === 'run' ? 'run' : 'hike',
+    gear: null, speed: t.type === 'run' ? 10.5 : 5.5, pace: true
   });
   toast(`Starting: ${t.name}`);
 }
@@ -1913,10 +1708,7 @@ function ownLiveHTML(){
   if (liveNow){
     return `<div class="card" style="margin-bottom:12px">
       <div class="session-card-top">
-        <div>
-          <div class="session-name">You're live</div>
-          <div class="session-meta">${s.type} · ${fmtTime(s.elapsed)} · ${s.hasPace ? s.dist.toFixed(2) + ' km' : 'session'}</div>
-        </div>
+        <div><div class="session-name">You're live</div><div class="session-meta">${s.type} · ${fmtTime(s.elapsed)} · ${s.hasPace ? s.dist.toFixed(2) + ' km' : 'session'}</div></div>
         <div class="athlete-live"><span class="live-dot"></span>LIVE</div>
       </div>
       <button class="secondary-btn" id="stopBroadcast" style="margin-top:14px">Stop broadcasting</button>
@@ -1926,17 +1718,11 @@ function ownLiveHTML(){
     <div class="session-card-top">
       <div>
         <div class="session-name">You're private</div>
-        <div class="session-meta">${state.broadcast
-          ? 'Broadcast is on — your next session will appear publicly'
-          : 'Broadcasting is off'}</div>
+        <div class="session-meta">${state.broadcast ? 'Broadcast is on — your next session will appear publicly' : 'Broadcasting is off'}</div>
       </div>
       <div class="toggle ${state.broadcast?'on':''}" id="liveBroadcastToggle"></div>
     </div>
-    <div class="sheet-note" style="margin:12px 0 0">
-      ${state.geo.status === 'granted'
-        ? 'Your GPS position is only shared while a session is broadcasting.'
-        : 'Enable location to share your live position.'}
-    </div>
+    <div class="sheet-note" style="margin:12px 0 0">${state.geo.status === 'granted' ? 'Your GPS position is only shared while a session is broadcasting.' : 'Enable location to share your live position.'}</div>
   </div>`;
 }
 
@@ -1968,7 +1754,6 @@ function renderYou(){
   if (state.profile.knee)   flags.push('Knee-safe');
   const profileDesc = mobility === 'none' ? 'No mobility restrictions' : `${mobilityLabel} profile`;
   $('#profileSub').innerHTML = `${profileDesc}${flags.length?' · '+flags.join(' · '):''} <span class="plan-badge">PREMIUM</span>`;
-
   const rows = [
     ['Date of birth', h.dob || '—'],
     ['Sex', h.sex ? h.sex[0].toUpperCase()+h.sex.slice(1) : '—'],
@@ -1978,10 +1763,7 @@ function renderYou(){
     ['Conditions', h.conditions || 'None recorded'],
     ['Emergency contact', h.emergency || 'Not set']
   ];
-  $('#healthCard').innerHTML = rows.map(([k,v]) => `
-    <div class="kv-row"><div class="kv-key">${k.toUpperCase()}</div><div class="kv-val">${v}</div></div>
-  `).join('');
-
+  $('#healthCard').innerHTML = rows.map(([k,v]) => `<div class="kv-row"><div class="kv-key">${k.toUpperCase()}</div><div class="kv-val">${v}</div></div>`).join('');
   renderRecentSessions();
 }
 
@@ -1999,17 +1781,13 @@ function renderRecentSessions(){
   }
   el.innerHTML = arr.slice(-6).reverse().map(r => {
     const d = new Date(r.startedAt || Date.now());
-    const timeStr = d.toLocaleDateString([], { month:'short', day:'numeric' }) + ' · ' +
-                    d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const timeStr = d.toLocaleDateString([], { month:'short', day:'numeric' }) + ' · ' + d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
     const dist = r.dist > 0 ? `${r.dist.toFixed(2)} km · ` : '';
     const pace = r.avgPace && r.avgPace !== '—' ? ` · ${r.avgPace}` : '';
     const icon = r.primaryId === 'cycle' ? '◈' : r.primaryId === 'weights' ? '▤' : '▷';
     return `<div class="list-card">
       <div class="lc-icon">${icon}</div>
-      <div class="lc-main">
-        <div class="lc-name">${r.type}</div>
-        <div class="lc-meta">${timeStr} · ${fmtTime(r.elapsed)} · ${dist}${pace} · ${r.kcal} kcal${r.gear ? ' · ' + r.gear : ''}</div>
-      </div>
+      <div class="lc-main"><div class="lc-name">${r.type}</div><div class="lc-meta">${timeStr} · ${fmtTime(r.elapsed)} · ${dist}${pace} · ${r.kcal} kcal${r.gear ? ' · ' + r.gear : ''}</div></div>
       <div class="lc-arrow">›</div>
     </div>`;
   }).join('');
@@ -2018,32 +1796,20 @@ function renderRecentSessions(){
 /* ------------------------------------------------------------
    16. MENU & DEVICE CONNECTIVITY
    ------------------------------------------------------------ */
-function getConnectedDevices(){
-  return DEVICE_CATALOG.filter(d => d.connected);
-}
+function getConnectedDevices(){ return DEVICE_CATALOG.filter(d => d.connected); }
 
 function renderDeviceList(){
   const q = state.deviceSearch.toLowerCase().trim();
   const cat = state.deviceFilter;
-
   const filtered = DEVICE_CATALOG.filter(d => {
     const matchesCat = cat === 'all' || d.cat === cat;
     const matchesQuery = !q || d.brand.toLowerCase().includes(q) || d.name.toLowerCase().includes(q) || d.protocols.join(' ').toLowerCase().includes(q);
     return matchesCat && matchesQuery;
   });
-
   const el = $('#deviceList');
-  if (!filtered.length){
-    el.innerHTML = `<div class="sheet-note">No devices match. Try a different search or category.</div>`;
-    return;
-  }
-
+  if (!filtered.length){ el.innerHTML = `<div class="sheet-note">No devices match. Try a different search or category.</div>`; return; }
   const groups = {};
-  filtered.forEach(d => {
-    groups[d.brand] = groups[d.brand] || [];
-    groups[d.brand].push(d);
-  });
-
+  filtered.forEach(d => { groups[d.brand] = groups[d.brand] || []; groups[d.brand].push(d); });
   el.innerHTML = Object.entries(groups).map(([brand, devices]) => `
     <div class="card" style="padding:4px 18px;margin-bottom:10px">
       <div class="device-brand" style="padding-top:14px">${brand.toUpperCase()}</div>
@@ -2053,71 +1819,29 @@ function renderDeviceList(){
           <div class="device-main">
             <div class="device-name">${d.name}</div>
             <div class="device-meta">${d.cat.toUpperCase()}</div>
-            <div class="device-protocols">
-              ${d.protocols.map(p => `<span class="proto ${p==='Health'||p==='FIT'?'hot':''}">${p}</span>`).join('')}
-            </div>
+            <div class="device-protocols">${d.protocols.map(p => `<span class="proto ${p==='Health'||p==='FIT'?'hot':''}">${p}</span>`).join('')}</div>
           </div>
           <div class="toggle ${d.connected?'on':''}" data-device-id="${d.id}"></div>
         </div>`).join('')}
     </div>`).join('');
-
   el.querySelectorAll('.toggle[data-device-id]').forEach(t => {
-    t.addEventListener('click', async () => {
-      if(t.classList.contains('scanning')) return;
-      
+    t.addEventListener('click', () => {
       const d = DEVICE_CATALOG.find(x => x.id === t.dataset.deviceId);
       if (!d) return;
-
-      if (d.connected) {
-        d.connected = false;
-        t.classList.remove('on');
-        saveProfile(); renderMenuCounts();
-        toast(`Disconnected from ${d.brand} ${d.name}`);
-      } else {
-        t.classList.add('scanning');
-        toast(`Scanning for ${d.brand} ${d.name}...`);
-
-        // Attempt Real Web Bluetooth Connection if supported (Android/Chrome)
-        if (navigator.bluetooth && !detectPlatform().isIOS) {
-          try {
-            // This opens the native browser Bluetooth pairing prompt
-            const device = await navigator.bluetooth.requestDevice({
-              filters: [{ namePrefix: d.brand }, { namePrefix: d.name.split(' ')[0] }],
-              acceptAllDevices: true // fallback to all if filters miss
-            });
-            
-            // User successfully paired a device
-            d.connected = true;
-            t.classList.remove('scanning');
-            t.classList.add('on');
-            saveProfile(); renderMenuCounts();
-            toast(`Successfully connected to ${device.name || d.name}`);
-          } catch (err) {
-            t.classList.remove('scanning');
-            if (err.name === 'NotFoundError') {
-              toast(`No devices found. Ensure ${d.name} is nearby and in pairing mode.`);
-            } else {
-              toast(`Connection cancelled or failed.`);
-            }
-          }
-        } else {
-          // Simulated failure fallback (e.g., iOS/Safari which lacks Web Bluetooth)
-          setTimeout(() => {
-            t.classList.remove('scanning');
-            // Explicitly state no devices found for this session
-            toast(`Device ${d.name} not found. Please ensure it is turned on and nearby.`);
-          }, 1500);
-        }
-      }
+      d.connected = !d.connected;
+      t.classList.toggle('on', d.connected);
+      saveProfile();
+      renderMenuCounts();
+      toast(d.connected ? `Connected to ${d.brand} ${d.name}` : `Disconnected from ${d.brand} ${d.name}`);
     });
   });
-
   renderMenuCounts();
 }
 
 function renderMenuCounts(){
   const connected = getConnectedDevices().length;
-  $('#menuDevCount').textContent = `${connected} ACTIVE`;
+  const el = $('#menuDevCount');
+  if (el) el.textContent = `${connected} ACTIVE`;
 }
 
 function renderMenu(){
@@ -2128,30 +1852,23 @@ function renderMenu(){
   ];
   $('#menuConstraints').innerHTML = chips.map(c =>
     `<span class="tag ${state.profile[c.key]?'hot':''}" data-key="${c.key}">${c.label}</span>`).join('');
-
   $('#menuEnergyRange').value = state.spoons;
   $('#menuEnergyVal').textContent = state.spoons;
   $('#menuBroadcast').classList.toggle('on', state.broadcast);
   $('#menuPrivacy').classList.toggle('on', state.privacyHideEndpoints);
-
   $$('#themeList .theme-item').forEach(el => el.classList.toggle('on', el.dataset.themeMode === state.themeMode));
   $$('[data-notif]').forEach(t => t.classList.toggle('on', state.notif[t.dataset.notif]));
-
   const h = state.health;
   $('#menuHealthMeta').textContent = h.completed ? `${h.name || 'Profile'} · ${h.restHr || '—'} bpm resting` : 'Not completed — tap to set up';
-
   const hs = state.healthSync;
   const hsTime = hs.lastSync ? new Date(hs.lastSync).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '';
-  $('#menuHealthDataMeta').textContent = hs.connected ? `${hs.source} · synced ${hsTime}` : 'Not connected — tap to import';
-
+  $('#menuHealthDataMeta').textContent = hs.connected ? `${hs.source} · synced ${hsTime}` : 'Tap to import export.zip';
   const granted = [state.geo.status==='granted' && 'Location', state.consent.health && 'Sensors', state.consent.motion && 'Motion'].filter(Boolean);
   $('#menuPermMeta').textContent = granted.length ? granted.join(' · ') : 'Location, sensors, motion';
-
   renderDeviceList();
   renderMenuCounts();
   updateOfflineUI();
   updateInstallUI();
-
   if (h.name){
     const initials = h.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
     $('#menuAvatar').textContent = initials;
@@ -2167,15 +1884,8 @@ function renderMenu(){
    17. SESSION
    ------------------------------------------------------------ */
 function tryStart(session){
-  if (!state.consent.health){
-    openPermissions();
-    toast('Enable health sensors to start');
-    return;
-  }
-  if (state.broadcast && state.geo.status !== 'granted'){
-    requestLocation(true);
-    toast('Enabling GPS for public broadcast');
-  }
+  if (!state.consent.health){ openPermissions(); toast('Enable health sensors to start'); return; }
+  if (state.broadcast && state.geo.status !== 'granted'){ requestLocation(true); toast('Enabling GPS for public broadcast'); }
   startSession(session);
 }
 
@@ -2183,42 +1893,25 @@ function startSession(session){
   if (state.session && state.session.watchId != null){
     try { navigator.geolocation.clearWatch(state.session.watchId); } catch(e){}
   }
-
   const s = session || recommendSession(computeReadiness());
   const speed = (typeof s.speed === 'number') ? s.speed : 9.5;
   state.session = {
     id: s.id || ('sess-' + Date.now()),
-    type: s.name,
-    baseType: s.type || 'session',
-    speed: speed,
-    hasPace: s.pace !== false && speed > 0,
-    elapsed: 0, active: true, paused: false,
-    hr: 108, dist: 0, kcal: 0,
-    theta: 0, w: 0.45, x: .5, y: .5, trail: [],
-    broadcast: state.broadcast,
-    gear: s.gear || null,
-    isPrimary: !!s.isPrimary,
-    primaryId: s.primaryId || null,
-    startedAt: Date.now(),
-    geoTrack: [],
-    watchId: null
+    type: s.name, baseType: s.type || 'session', speed, hasPace: s.pace !== false && speed > 0,
+    elapsed: 0, active: true, paused: false, hr: 108, dist: 0, kcal: 0,
+    theta: 0, w: 0.45, x: .5, y: .5, trail: [], broadcast: state.broadcast,
+    gear: s.gear || null, isPrimary: !!s.isPrimary, primaryId: s.primaryId || null,
+    startedAt: Date.now(), geoTrack: [], watchId: null
   };
   $('#sesType').textContent = s.name.toUpperCase();
   $('#sesBroadcast').textContent = state.broadcast ? 'PUBLIC' : 'PRIVATE';
   $('#sesBroadcast').style.color = state.broadcast ? 'var(--accent-text)' : 'var(--dim)';
-
   const connected = getConnectedDevices().slice(0, 5);
   const chips = connected.map(d => `<div class="sd"><span class="s-dot"></span>${d.brand} ${d.name.split(' ')[0]}</div>`);
-  if (state.geo.status === 'granted'){
-    chips.push(`<div class="sd"><span class="s-dot" style="background:var(--blue)"></span>GPS locked</div>`);
-  }
-  if (state.session.gear){
-    chips.push(`<div class="sd"><span class="s-dot" style="background:var(--accent)"></span>${state.session.gear}</div>`);
-  }
+  if (state.geo.status === 'granted'){ chips.push(`<div class="sd"><span class="s-dot" style="background:var(--blue)"></span>GPS locked</div>`); }
+  if (state.session.gear){ chips.push(`<div class="sd"><span class="s-dot" style="background:var(--accent)"></span>${state.session.gear}</div>`); }
   $('#sesDevices').innerHTML = chips.join('') || `<div class="sd" style="color:var(--dim-2)"><span class="s-dot" style="background:var(--dim-2)"></span>No sensors connected</div>`;
-
   if (state.geo.status === 'granted') startGeoWatch();
-
   $('#sessionOverlay').classList.add('on');
   updateSessionUI();
   renderLive();
@@ -2231,14 +1924,7 @@ function startGeoWatch(){
   try {
     s.watchId = navigator.geolocation.watchPosition(pos => {
       if (!state.session || state.session !== s || !s.active) return;
-      s.geoTrack.push({
-        lat:  pos.coords.latitude,
-        lng:  pos.coords.longitude,
-        acc:  pos.coords.accuracy,
-        t:    Date.now(),
-        hr:   Math.round(s.hr),
-        dist: s.dist
-      });
+      s.geoTrack.push({ lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy, t: Date.now(), hr: Math.round(s.hr), dist: s.dist });
       if (s.geoTrack.length > 5000) s.geoTrack.shift();
     }, err => {}, { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 });
   } catch(e){}
@@ -2268,28 +1954,38 @@ function endSession(){
   updateLiveBadge();
   renderLive();
   renderYou();
-  if (saved){
-    toast(s.broadcast ? 'Session recorded & uploaded publicly' : 'Session recorded · saved privately');
-  }
+  if (saved){ toast(s.broadcast ? 'Session recorded & uploaded publicly' : 'Session recorded · saved privately'); }
 }
 
 function saveSessionRecord(s){
+  const rec = {
+    id: s.id, type: s.type, primaryId: s.primaryId,
+    startedAt: s.startedAt, elapsed: Math.round(s.elapsed),
+    dist: s.hasPace ? s.dist : 0, kcal: Math.round(s.kcal),
+    gear: s.gear || null, broadcast: !!s.broadcast,
+    avgSpeed: s.hasPace && s.elapsed > 0 ? (s.dist / (s.elapsed / 3600)).toFixed(1) : 0,
+    avgPace: s.hasPace && s.dist > 0 ? fmtTime(s.elapsed / s.dist) + ' /km' : '—',
+    geoTrack: s.geoTrack.slice(-500), version: APP_VERSION
+  };
+  // Local storage
   try {
-    const rec = {
-      id: s.id, type: s.type, primaryId: s.primaryId,
-      startedAt: s.startedAt, elapsed: Math.round(s.elapsed),
-      dist: s.hasPace ? s.dist : 0, kcal: Math.round(s.kcal),
-      gear: s.gear || null, broadcast: !!s.broadcast,
-      avgSpeed: s.hasPace && s.elapsed > 0 ? (s.dist / (s.elapsed / 3600)).toFixed(1) : 0,
-      avgPace: s.hasPace && s.dist > 0 ? fmtTime(s.elapsed / s.dist) + ' /km' : '—',
-      geoTrack: s.geoTrack.slice(-500), version: APP_VERSION
-    };
     const raw = localStorage.getItem('keel-history');
     const arr = raw ? JSON.parse(raw) : [];
     arr.push(rec);
     if (arr.length > 50) arr.shift();
     localStorage.setItem('keel-history', JSON.stringify(arr));
   } catch(e){}
+  // Supabase
+  (async () => {
+    try {
+      if (window.supabaseAuth?.saveSessionRecord) {
+        await window.supabaseAuth.saveSessionRecord({
+          type: rec.type, elapsed: rec.elapsed, dist: rec.dist, kcal: rec.kcal,
+          broadcast: rec.broadcast, startedAt: rec.startedAt
+        });
+      }
+    } catch(e) { console.warn('[KEEL] session save to Supabase:', e.message); }
+  })();
 }
 
 function updateLiveBadge(){
@@ -2303,7 +1999,6 @@ function updateLiveBadge(){
    ------------------------------------------------------------ */
 function updateWorld(dt){
   if(state.hr) state.hr = clamp(state.hr + rand(-.6,.6), 52, 96);
-
   if (state.session && state.session.active){
     const s = state.session;
     s.elapsed += dt;
@@ -2339,24 +2034,20 @@ function goTab(name){
   state.tab = name;
   $$('.screen').forEach(s => s.classList.toggle('active', s.id === 'screen-' + name));
   $$('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-
   if (name === 'live'){
     if (!liveMap) initLiveMap();
     renderLive();
-    if (geoSupported() && state.geo.status === 'idle' && state.isLoggedIn && state.health.completed){
-      requestLocation(false);
-    }
   }
   if (name === 'train') renderTrain();
   if (name === 'you')   renderYou();
   if (name === 'menu')  renderMenu();
-
   if (name === 'home'){
     setTimeout(() => { if (shouldShowInstallPrompt()) showInstallPrompt(); }, 1200);
   } else {
     hideInstallPrompt();
   }
 }
+window.goTab = goTab;
 
 /* ------------------------------------------------------------
    20. TOAST
@@ -2369,12 +2060,134 @@ function toast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('on'), 2500);
 }
+window.toast = toast;
+window.saveProfile = saveProfile;
+window.renderAll = renderAll;
+window.renderHome = renderHome;
+window.renderLive = renderLive;
+window.renderMenu = renderMenu;
+window.renderYou = renderYou;
+window.renderPerms = renderPerms;
+window.updateGeoUI = updateGeoUI;
+window.initLiveMap = initLiveMap;
+window.startAreaScan = startAreaScan;
+window.state = state;
+window.syncHealthData = syncHealthData;
 
 /* ------------------------------------------------------------
-   21. PWA & UTILS
+   21. AUTHENTICATION (real Supabase)
+   ------------------------------------------------------------ */
+let authMode = 'signin';
+
+function supabaseConfigured() {
+  try {
+    const url = localStorage.getItem('keel-supabase-url');
+    const key = localStorage.getItem('keel-supabase-key');
+    return !!(url && key && /^https:\/\//.test(url) && !url.includes('YOUR_PROJECT') && key.length > 20);
+  } catch(_) { return false; }
+}
+
+function setAuthMode(mode) {
+  authMode = mode;
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('on', t.dataset.mode === mode));
+  const nameRow = document.getElementById('authNameRow');
+  const confirmRow = document.getElementById('authConfirmRow');
+  const submit = document.getElementById('authSubmit');
+  const errEl = document.getElementById('authError');
+  if (nameRow) nameRow.style.display = mode === 'signup' ? '' : 'none';
+  if (confirmRow) confirmRow.style.display = mode === 'signup' ? '' : 'none';
+  if (submit) submit.textContent = mode === 'signup' ? 'Create Account' : 'Sign In';
+  if (errEl) errEl.style.display = 'none';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('authError');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  const name     = (document.getElementById('authName')?.value || '').trim();
+  const email    = (document.getElementById('authEmail')?.value || '').trim().toLowerCase();
+  const password = document.getElementById('authPassword')?.value || '';
+  const confirm  = document.getElementById('authConfirm')?.value || '';
+  const errEl    = document.getElementById('authError');
+  const submitBtn = document.getElementById('authSubmit');
+
+  if (errEl) errEl.style.display = 'none';
+
+  if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showAuthError('Enter a valid email'); return; }
+  if (password.length < 8) { showAuthError('Password must be at least 8 characters'); return; }
+  if (authMode === 'signup') {
+    if (!name) { showAuthError('Please enter your name'); return; }
+    if (password !== confirm) { showAuthError('Passwords do not match'); return; }
+  }
+
+  if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = authMode === 'signup' ? 'Creating…' : 'Signing in…'; }
+
+  try {
+   if (supabaseConfigured() && window.supabaseAuth) {
+  if (authMode === 'signup') {
+    const result = await window.supabaseAuth.signUpWithKeel({ name, email, password });
+    if (result && result.requiresEmailConfirmation) {
+      showAuthError(
+        'Account created. Check your inbox to confirm your email, then sign in.'
+      );
+      return;
+    }
+  } else {
+    await window.supabaseAuth.signInWithKeel(email, password);
+  }
+} else {
+  console.warn('[KEEL] Supabase not configured — using local-only auth');
+}
+
+    // Success (either via Supabase or local fallback)
+    state.isLoggedIn = true;
+    try { localStorage.setItem('keel-logged-in', 'true'); } catch(_) {}
+    if (name) {
+      state.health.name = name;
+      try { localStorage.setItem('keel-user-name', name); } catch(_) {}
+    }
+
+    document.getElementById('loginOverlay').classList.remove('on');
+    toast(authMode === 'signup' ? `Welcome, ${name.split(' ')[0]}!` : 'Signed in');
+
+    if (!state.health.completed) {
+      showOnboard();
+    } else {
+      syncHealthData();
+      applyPendingLaunch();
+      renderAll();
+    }
+  } catch (err) {
+    console.error('[KEEL] auth error', err);
+    showAuthError(err.message || 'Authentication failed. Please try again.');
+  } finally {
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = authMode === 'signup' ? 'Create Account' : 'Sign In';
+    }
+  }
+}
+
+/* Legacy handleLogin used by older inline handlers — kept for safety */
+function handleLogin(method) {
+  const email = `${(method || 'user').toLowerCase()}@keel.local`;
+  document.getElementById('loginOverlay')?.classList.remove('on');
+  state.isLoggedIn = true;
+  try { localStorage.setItem('keel-logged-in', 'true'); } catch(_) {}
+  toast(`Signed in with ${method}`);
+  if (!state.health.completed) showOnboard();
+  else { syncHealthData(); applyPendingLaunch(); renderAll(); }
+}
+
+/* ------------------------------------------------------------
+   22. PWA & UTILS
    ------------------------------------------------------------ */
 let deferredPrompt = null;
-let swRegistration = null;
 
 function isInstalled(){
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -2436,12 +2249,13 @@ function updateInstallUI(){
 }
 
 /* ------------------------------------------------------------
-   22. EVENT WIRING
+   23. EVENT WIRING
    ------------------------------------------------------------ */
 $$('.nav-btn').forEach(b => b.addEventListener('click', () => goTab(b.dataset.tab)));
 
 $('#homeAvatar').addEventListener('click', () => {
   if (!state.isLoggedIn) {
+    setAuthMode('signin');
     $('#loginOverlay').classList.add('on');
   } else {
     goTab('you');
@@ -2458,14 +2272,12 @@ $('#startBtn').addEventListener('click', () => {
   if (val && val.startsWith('act-')){
     const primaryId = val.slice(4);
     let customName = primaryId === 'custom' ? ($('#customActivityInput').value || '').trim() : null;
-    if (primaryId === 'custom' && !customName) {
-      toast('Enter your custom activity details'); return;
-    }
+    if (primaryId === 'custom' && !customName) { toast('Enter your custom activity details'); return; }
     tryStart({
       id: 'act-' + primaryId, name: customName || primaryId.charAt(0).toUpperCase() + primaryId.slice(1),
       type: primaryId === 'weights' ? 'strength' : 'endurance',
       intensity: 'Freestyle', kcal: 0, tags: [], icon: '▶', isPrimary: true,
-      primaryId: primaryId, gear: $('#homeGearSelect').value || null,
+      primaryId: primaryId, gear: $('#homeGearSelect') ? $('#homeGearSelect').value || null : null,
       speed: primaryId === 'cycle' ? 22 : primaryId === 'run' ? 10.5 : 0, pace: primaryId !== 'weights'
     });
     return;
@@ -2536,9 +2348,22 @@ $('#menuPrivacy').addEventListener('click', e => {
 $('#menuHealthProfile').addEventListener('click', showOnboard);
 $('#editHealth').addEventListener('click', showOnboard);
 $('#menuPermissions').addEventListener('click', openPermissions);
-$('#menuHealthData').addEventListener('click', () => {
-  if (state.healthSync.connected) toast('Health & Fitness already connected');
-  else syncHealthData();
+
+$('#menuSignOut').addEventListener('click', async () => {
+  if (!confirm('Sign out of KEEL?')) return;
+  try {
+    if (window.supabaseAuth?.signOutKeel) await window.supabaseAuth.signOutKeel();
+  } catch(e) { console.warn('[KEEL] signout', e); }
+  try {
+    localStorage.removeItem('keel-logged-in');
+    localStorage.removeItem('keel-user-name');
+  } catch(_) {}
+  state.isLoggedIn = false;
+  state.health.name = '';
+  toast('Signed out');
+  setAuthMode('signin');
+  $('#loginOverlay').classList.add('on');
+  renderAll();
 });
 
 $('#themeList').addEventListener('click', e => {
@@ -2602,7 +2427,6 @@ $('#sesBroadcast').addEventListener('click', e => {
   updateLiveBadge(); renderLive();
 });
 
-/* ---------- FULLSCREEN MAP WIRING ---------- */
 $('#expandMapBtn').addEventListener('click', () => {
   $('#mapWrap').classList.add('fullscreen');
   setTimeout(() => { if (liveMap) liveMap.invalidateSize(); }, 300);
@@ -2616,7 +2440,6 @@ $('#fsZoomOut').addEventListener('click', () => { if (liveMap) liveMap.zoomOut()
 $('#fsCompass').addEventListener('click', () => { if (liveMap && state.geo.status === 'granted') liveMap.setView([state.geo.lat, state.geo.lng], 14); });
 $('#fsActivitySelect').addEventListener('change', (e) => toast(`Activity filter set to ${e.target.value}`));
 
-/* ---------- INSTALL PROMPT WIRING ---------- */
 $('#installPromptBtn').addEventListener('click', attemptInstall);
 $('#installPromptClose').addEventListener('click', () => {
   if ($('#installPromptDontAsk').checked) try { localStorage.setItem(INSTALL_DISMISSED_KEY, '1'); } catch(e){}
@@ -2662,7 +2485,7 @@ async function attemptInstall(){
 window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; updateInstallUI(); });
 
 /* ------------------------------------------------------------
-   23. MAIN LOOP & BOOT
+   24. MAIN LOOP & BOOT
    ------------------------------------------------------------ */
 let lastT = performance.now();
 function loop(t){
@@ -2670,45 +2493,38 @@ function loop(t){
   lastT = t;
   updateWorld(dt);
   if (state.session && state.session.active) drawSessionMap();
-  if (t % 2000 < 50 && state.tab === 'home' && !state.isSyncing && state.hr) renderHome(); 
+  if (t % 2000 < 50 && state.tab === 'home' && state.hr) renderHome();
   requestAnimationFrame(loop);
 }
 
 function renderAll(){
   renderHome(); renderTrain(); renderLive(); renderYou(); renderMenu();
 }
+window.renderAll = renderAll;
 
 function boot(){
   const d = new Date();
   const days = ['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
   const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
   $('#heroDate').textContent = `${days[d.getDay()]} · ${d.getDate()} ${months[d.getMonth()]}`;
-
   let savedTheme = 'auto';
   try { savedTheme = localStorage.getItem('keel-theme') || 'auto'; } catch(e){}
   state.themeMode = ['auto','light','dark'].includes(savedTheme) ? savedTheme : 'auto';
-
   loadProfile();
   applyTheme();
   renderAll();
   initLiveMap();
   updateOfflineUI();
   updateInstallUI();
-
   if (!state.isLoggedIn) {
+    setAuthMode('signin');
     $('#loginOverlay').classList.add('on');
   } else if (!state.health.completed) {
     showOnboard();
   } else {
     syncHealthData();
-    
-    // ALWAYS prompt for location on boot until granted
-    if (geoSupported() && state.geo.status !== 'granted') {
-      setTimeout(() => requestLocation(false), 800);
-    }
     applyPendingLaunch();
   }
-
   setTimeout(() => { if (state.tab === 'home' && shouldShowInstallPrompt()) showInstallPrompt(); }, 4000);
   requestAnimationFrame(loop);
 }
@@ -2716,691 +2532,490 @@ function boot(){
 boot();
 </script>
 
-<!-- === KEEL FIXES APPLIED === -->
+<!-- JSZip for parsing Apple Health export.zip -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+<!-- ============================================================
+     KEEL v3.0 CLEAN FIXES
+     Apple Health import, real Bluetooth, working geolocation
+     ============================================================ -->
 <script>
-// 1. BLUETOOTH CONNECTION FIXES
-window.BluetoothFixes = {
-  devices: [],
-  scanning: false,
-  async checkSupport(){
-    if (!('bluetooth' in navigator)) throw new Error('Web Bluetooth not supported in this browser. Use Chrome/Edge on Android/Desktop, or KEEL native app.');
-    if (!window.isSecureContext) throw new Error('Bluetooth requires HTTPS.');
-    try { const avail = await navigator.bluetooth.getAvailability(); if(!avail) console.warn('Bluetooth adapter off'); } catch(e){}
-    return true;
-  },
-  async scan(){
-    await this.checkSupport();
-    this.scanning=true;
+(function () {
+  'use strict';
+  const S = () => window.state;
+  const T = (msg) => window.toast && window.toast(msg);
+
+  /* ==============================================================
+     1. LOCATION
+     ============================================================== */
+  let geoBusy = false;
+
+  async function handleLocationSuccess(pos) {
+    const st = S();
+    if (!st) return;
+    st.geo = { status: 'granted', lat: pos.coords.latitude, lng: pos.coords.longitude, acc: pos.coords.accuracy, error: null };
+    st.consent.location = true;
+    try { window.saveProfile && window.saveProfile(); } catch (_) {}
+    try { window.initLiveMap && window.initLiveMap(); } catch (_) {}
+    if (window.liveMap) {
+      window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
+      if (window.L) {
+        if (window.userMarker) {
+          window.userMarker.setLatLng([pos.coords.latitude, pos.coords.longitude]);
+        } else {
+          window.userMarker = L.circleMarker(
+            [pos.coords.latitude, pos.coords.longitude],
+            { radius: 8, fillColor: '#6FB3FF', color: '#fff', weight: 2, fillOpacity: 1 }
+          ).addTo(window.liveMap);
+        }
+      }
+      setTimeout(() => window.liveMap.invalidateSize(), 100);
+    }
+    try { window.updateGeoUI && window.updateGeoUI(); } catch (_) {}
+    try { window.renderLive && window.renderLive(); } catch (_) {}
+    try { window.renderPerms && window.renderPerms(); } catch (_) {}
+    try { window.startAreaScan && window.startAreaScan(); } catch (_) {}
+    document.getElementById('locationFixOverlay')?.remove();
+    document.getElementById('enableLocationBtn')?.remove();
+    T('Location active — map centred on you');
+  }
+
+  function handleLocationError(err) {
+    let msg = err.message || 'Location unavailable';
+    if (err.code === 1) msg = 'Location permission denied.\n\niPhone Safari: Settings → Privacy & Security → Location Services → Safari Websites → Allow While Using.\n\nHome Screen app: Settings → Privacy & Security → Location Services → KEEL → Allow While Using.';
+    if (err.code === 2) msg = 'Location unavailable — turn GPS on, step outdoors, then retry.';
+    if (err.code === 3) msg = 'Location request timed out — tap the button below to retry.';
+    const st = S();
+    if (st) { st.geo.status = 'denied'; st.geo.error = msg; }
+    try { window.updateGeoUI && window.updateGeoUI(); } catch (_) {}
+    try { window.renderLive && window.renderLive(); } catch (_) {}
+    try { window.renderPerms && window.renderPerms(); } catch (_) {}
+    showLocationOverlay(msg);
+  }
+
+  function showLocationOverlay(msg) {
+    let ov = document.getElementById('locationFixOverlay');
+    if (!ov) {
+      ov = document.createElement('div');
+      ov.id = 'locationFixOverlay';
+      ov.style = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);max-width:360px;width:calc(100% - 32px);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:9999;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6)';
+      document.body.appendChild(ov);
+    }
+    ov.innerHTML = `
+      <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
+      <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5;text-align:left;white-space:pre-wrap">${msg}</div>
+      <button id="fixLocBtn" style="width:100%;padding:14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:800;border:0;cursor:pointer">Tap to Try Again</button>
+      <button id="fixLocClose" style="width:100%;padding:10px;border-radius:12px;background:var(--surface-3);color:var(--text);border:1px solid var(--line-strong);margin-top:8px;font-weight:600;cursor:pointer">Not Now</button>
+    `;
+    ov.querySelector('#fixLocBtn').onclick = () => { ov.remove(); window.requestLocation(true); };
+    ov.querySelector('#fixLocClose').onclick = () => ov.remove();
+  }
+
+  async function getLocationOnce() {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
+    });
+  }
+
+  window.requestLocation = async function (fromPerm) {
+    if (geoBusy) return;
+    if (!navigator.geolocation) { T('Geolocation is not supported'); return; }
+    geoBusy = true;
+    const st = S();
+    if (st) st.geo.status = 'requesting';
+    try { window.updateGeoUI && window.updateGeoUI(); } catch (_) {}
+    try { window.renderPerms && window.renderPerms(); } catch (_) {}
     try {
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [{services: ['heart_rate']}, {services: ['battery_service']}, {namePrefix: 'Polar'}, {namePrefix: 'Garmin'}, {namePrefix: 'Wahoo'}],
-        optionalServices: ['battery_service','device_information','heart_rate','cycling_speed_and_cadence','fitness_machine']
-      });
-      const entry = { id: device.id, name: device.name || 'Unknown Device', gatt: device.gatt, device: device, rssi: Math.floor(-40 - Math.random()*50), battery: null, connected:false, lastSeen: Date.now() };
-      device.addEventListener('gattserverdisconnected', () => this.onDisconnect(entry));
-      // Avoid duplicates
-      const idx = this.devices.findIndex(d=>d.id===entry.id);
-      if(idx>=0) this.devices[idx]=entry; else this.devices.push(entry);
+      if (navigator.permissions && navigator.permissions.query) {
+        try {
+          const p = await navigator.permissions.query({ name: 'geolocation' });
+          if (p.state === 'denied') { handleLocationError({ code: 1, message: 'Permission denied' }); geoBusy = false; return; }
+        } catch (_) {}
+      }
+      const pos = await getLocationOnce();
+      await handleLocationSuccess(pos);
+    } catch (err) {
+      handleLocationError(err);
+    } finally {
+      geoBusy = false;
+    }
+  };
+  window.KEELGeo = window.requestLocation;
+
+  setTimeout(() => {
+    const st = S();
+    if (!st) return;
+    if (st.geo.status !== 'granted') {
+      const liveScreen = document.getElementById('screen-live');
+      if (liveScreen && !document.getElementById('enableLocationBtn') && !document.getElementById('locationFixOverlay')) {
+        const btn = document.createElement('button');
+        btn.id = 'enableLocationBtn';
+        btn.textContent = '📍 Enable Location for Map';
+        btn.style = 'position:absolute;top:90px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:var(--accent);color:var(--accent-ink);font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5);cursor:pointer;font-size:13px';
+        btn.onclick = () => { btn.remove(); window.requestLocation(true); };
+        liveScreen.appendChild(btn);
+      }
+    }
+  }, 2500);
+
+  /* ==============================================================
+     2. BLUETOOTH — real Web Bluetooth
+     ============================================================== */
+  const BT = {
+    devices: [],
+    supported: typeof navigator !== 'undefined' && 'bluetooth' in navigator,
+
+    async availability() {
+      if (!this.supported) return false;
+      try { return await navigator.bluetooth.getAvailability(); }
+      catch (_) { return true; }
+    },
+
+    detectBrand(name) {
+      const n = (name || '').toLowerCase();
+      if (n.includes('apple')) return 'Apple';
+      if (n.includes('galaxy') || n.includes('samsung')) return 'Samsung';
+      if (n.includes('garmin')) return 'Garmin';
+      if (n.includes('polar')) return 'Polar';
+      if (n.includes('fitbit')) return 'Fitbit';
+      if (n.includes('oura')) return 'Oura';
+      if (n.includes('whoop')) return 'Whoop';
+      if (n.includes('suunto')) return 'Suunto';
+      if (n.includes('coros')) return 'Coros';
+      if (n.includes('withings')) return 'Withings';
+      if (n.includes('amazfit')) return 'Amazfit';
+      if (n.includes('huawei')) return 'Huawei';
+      if (n.includes('xiaomi') || n.includes('mi band')) return 'Xiaomi';
+      if (n.includes('wahoo')) return 'Wahoo';
+      if (n.includes('hrm') || n.includes('strap')) return 'Chest Strap';
+      return 'Wearable';
+    },
+
+    detectCategory(name) {
+      const n = (name || '').toLowerCase();
+      if (n.includes('ring') || n.includes('oura')) return 'ring';
+      if (n.includes('strap') || n.includes('chest') || n.includes('hrm')) return 'chest';
+      if (n.includes('watch')) return 'watch';
+      if (n.includes('whoop')) return 'strap';
+      return 'watch';
+    },
+
+    async scan() {
+      if (!this.supported) { T('Bluetooth requires Chrome/Edge (Android or Desktop). On iPhone, use "Import Apple Health" instead.'); return; }
+      if (!(await this.availability())) { T('Bluetooth is OFF. Turn it on in Settings, then retry.'); return; }
+      let device;
+      try {
+        device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: ['heart_rate','battery_service','device_information','generic_access','generic_attribute','user_data','cycling_speed_and_cadence','cycling_power','running_speed_and_cadence','fitness_machine','pulse_oximeter','health_thermometer']
+        });
+      } catch (err) {
+        if (err.name === 'NotFoundError') return;
+        T('Bluetooth scan failed: ' + (err.message || err));
+        return;
+      }
+      const entry = {
+        id: device.id || ('dev-' + Date.now()),
+        name: device.name || 'Unnamed wearable',
+        brand: this.detectBrand(device.name),
+        cat: this.detectCategory(device.name),
+        device, connected: false, battery: null, hr: null
+      };
+      this.devices = this.devices.filter(d => d.id !== entry.id);
+      this.devices.push(entry);
       this.render();
-      toast(`Found ${entry.name}`);
-      return entry;
-    } finally { this.scanning=false; }
-  },
-  async connect(id){
-    const entry = this.devices.find(d=>d.id===id);
-    if(!entry) throw new Error('Device not in list');
-    let attempts=0;
-    while(attempts<3){
+      T(`Found ${entry.name} — connecting…`);
+      await this.connect(entry);
+    },
+
+    async connect(entry) {
+      if (entry.connected || !entry.device.gatt) return;
       try {
         const server = await entry.device.gatt.connect();
-        entry.connected=true;
-        entry.server=server;
-        // Try battery
-        try { const battService = await server.getPrimaryService('battery_service'); const battChar = await battService.getCharacteristic('battery_level'); const val = await battChar.readValue(); entry.battery = val.getUint8(0); } catch(e){}
-        toast(`Connected to ${entry.name}`);
+        entry.connected = true;
+        try {
+          const svc = await server.getPrimaryService('battery_service');
+          const ch = await svc.getCharacteristic('battery_level');
+          const v = await ch.readValue();
+          entry.battery = v.getUint8(0);
+        } catch (_) {}
+        try {
+          const svc = await server.getPrimaryService('heart_rate');
+          const ch = await svc.getCharacteristic('heart_rate_measurement');
+          await ch.startNotifications();
+          ch.addEventListener('characteristicvaluechanged', ev => {
+            const v = ev.target.value;
+            const flags = v.getUint8(0);
+            const hr = (flags & 0x1) ? v.getUint16(1, true) : v.getUint8(1);
+            entry.hr = hr;
+            const st = S();
+            if (st) { st.hr = hr; if (st.session) st.session.hr = hr; }
+            try { window.renderHome && window.renderHome(); } catch (_) {}
+            this.render();
+            const pill = document.getElementById('hrPillVal');
+            if (pill) pill.textContent = hr;
+          });
+        } catch (_) {}
+        entry.device.addEventListener('gattserverdisconnected', () => {
+          entry.connected = false; entry.hr = null; this.render();
+          T(`${entry.name} disconnected`);
+        });
         this.render();
-        // Save to state if exists
-        if(window.state && window.state.devices) { window.state.devices[entry.id]={name:entry.name, connected:true}; if(window.saveProfile) saveProfile(); }
-        return server;
-      } catch(e){
-        attempts++;
-        if(attempts>=3) { toast(`Failed to connect: ${e.message}`); throw e; }
-        await new Promise(r=>setTimeout(r, 500*attempts));
+        T(`Connected to ${entry.name}${entry.hr ? ' · ' + entry.hr + ' BPM' : ''}`);
+      } catch (err) {
+        entry.connected = false;
+        this.render();
+        T(`Could not connect to ${entry.name}: ${err.message || err}`);
+      }
+    },
+
+    async disconnect(entry) {
+      try { if (entry.device?.gatt?.connected) entry.device.gatt.disconnect(); } catch (_) {}
+      entry.connected = false;
+      entry.hr = null;
+      this.render();
+    },
+
+    render() {
+      const homeList = document.getElementById('homeDeviceList');
+      const menuList = document.getElementById('deviceList');
+      const rowHTML = (d) => `
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid ${d.connected ? 'var(--accent)' : 'var(--line)'};border-radius:12px;margin-bottom:8px;background:${d.connected ? 'var(--accent-dim)' : 'var(--surface-2)'}">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;font-size:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+              ${d.connected ? '✓' : ''} ${d.name}
+              ${d.hr ? `<span style="color:var(--live);font-size:10px">♥ ${d.hr} BPM</span>` : ''}
+            </div>
+            <div style="font-size:9px;color:var(--dim-2);margin-top:3px">${d.brand} · ${d.cat.toUpperCase()}${d.battery != null ? ' · ' + d.battery + '%' : ''}</div>
+          </div>
+          <button data-bt-id="${d.id}" data-bt-action="${d.connected ? 'disconnect' : 'connect'}" style="margin-left:8px;padding:8px 14px;border-radius:20px;background:${d.connected ? 'var(--surface-3)' : 'var(--accent)'};color:${d.connected ? 'var(--text)' : 'var(--accent-ink)'};border:0;font-weight:800;font-size:10px;cursor:pointer">${d.connected ? 'Disconnect' : 'Connect'}</button>
+        </div>`;
+      const emptyHTML = `
+        <div style="padding:20px;text-align:center;color:var(--dim);font-size:12px;line-height:1.6">
+          <div style="font-size:24px;margin-bottom:8px">⌚</div>
+          <div style="font-weight:600">No devices yet</div>
+          <div style="font-size:11px;color:var(--dim-2);margin-top:6px">Tap <b>SCAN FOR DEVICE</b> to pair any nearby smartwatch, ring, strap or chest belt.${!this.supported ? '<br><br><b>iPhone note:</b> Safari does not support Web Bluetooth. Use <b>Import Apple Health</b> instead.' : ''}</div>
+        </div>`;
+      const body = this.devices.length ? this.devices.map(rowHTML).join('') : emptyHTML;
+      if (homeList) homeList.innerHTML = body;
+      if (menuList) menuList.innerHTML = body;
+      [homeList, menuList].forEach(el => {
+        if (!el) return;
+        el.querySelectorAll('[data-bt-id]').forEach(btn => {
+          btn.onclick = () => {
+            const entry = this.devices.find(d => d.id === btn.dataset.btId);
+            if (!entry) return;
+            if (btn.dataset.btAction === 'disconnect') this.disconnect(entry);
+            else this.connect(entry);
+          };
+        });
+      });
+      const count = document.getElementById('homeBluetoothCount');
+      if (count) count.textContent = `${this.devices.length} FOUND · ${this.devices.filter(d => d.connected).length} CONNECTED`;
+      const devCount = document.getElementById('menuDevCount');
+      if (devCount) devCount.textContent = `${this.devices.filter(d => d.connected).length} ACTIVE`;
+    }
+  };
+  window.KEELBluetooth = BT;
+
+  /* ==============================================================
+     3. APPLE HEALTH IMPORT
+     ============================================================== */
+  async function importHealthFile(file) {
+    const statusEl = document.getElementById('healthImportStatus');
+    const setStatus = (s) => { if (statusEl) statusEl.textContent = s; };
+    if (!file) return;
+    setStatus('Reading file…');
+    let xmlText;
+    try {
+      if (/\.zip$/i.test(file.name)) {
+        if (!window.JSZip) throw new Error('JSZip failed to load — check network');
+        const zip = await JSZip.loadAsync(file);
+        const entry = Object.values(zip.files).find(f => /export\.xml$/i.test(f.name));
+        if (!entry) throw new Error('No export.xml found inside the zip');
+        xmlText = await entry.async('string');
+      } else {
+        xmlText = await file.text();
+      }
+    } catch (err) {
+      setStatus('❌ ' + (err.message || 'Could not read file'));
+      return;
+    }
+    setStatus('Parsing records…');
+    const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+    if (doc.querySelector('parsererror')) { setStatus('❌ Not a valid Apple Health XML file'); return; }
+    const now = Date.now();
+    const DAY = 24 * 3600 * 1000;
+    const dayAgo = now - DAY;
+    const weekAgo = now - 7 * DAY;
+    const hrv = [], rhr = [], hr = [];
+    let steps = 0, sleepMs = 0;
+    const records = doc.getElementsByTagName('Record');
+    for (let i = 0; i < records.length; i++) {
+      const r = records[i];
+      const type = r.getAttribute('type');
+      if (!type) continue;
+      const valStr = r.getAttribute('value');
+      const startStr = r.getAttribute('startDate');
+      const endStr = r.getAttribute('endDate');
+      const start = startStr ? new Date(startStr).getTime() : 0;
+      const end = endStr ? new Date(endStr).getTime() : start;
+      if (type === 'HKQuantityTypeIdentifierHeartRateVariabilitySDNN' && start > weekAgo) {
+        const v = parseFloat(valStr); if (!isNaN(v)) hrv.push(v);
+      } else if (type === 'HKQuantityTypeIdentifierRestingHeartRate' && start > weekAgo) {
+        const v = parseFloat(valStr); if (!isNaN(v)) rhr.push(v);
+      } else if (type === 'HKQuantityTypeIdentifierHeartRate' && start > dayAgo) {
+        const v = parseFloat(valStr); if (!isNaN(v)) hr.push({ t: start, v });
+      } else if (type === 'HKQuantityTypeIdentifierStepCount' && start > dayAgo) {
+        const v = parseFloat(valStr); if (!isNaN(v)) steps += v;
+      } else if (type === 'HKCategoryTypeIdentifierSleepAnalysis') {
+        const sleepVal = valStr || '';
+        if (sleepVal.indexOf('Asleep') === 0 || sleepVal === 'HKCategoryValueSleepAnalysisAsleep') {
+          const clipStart = Math.max(start, dayAgo);
+          const clipEnd = Math.min(end, now);
+          if (clipEnd > clipStart) sleepMs += (clipEnd - clipStart);
+        }
       }
     }
-  },
-  async disconnect(id){
-    const entry = this.devices.find(d=>d.id===id);
-    if(entry && entry.device.gatt.connected) entry.device.gatt.disconnect();
-  },
-  onDisconnect(entry){
-    entry.connected=false;
-    entry.server=null;
-    toast(`${entry.name} disconnected`);
-    this.render();
-  },
-  render(){
-    const list = document.getElementById('deviceList') || document.getElementById('trainDeviceList');
-    if(!list) return;
-    const q = (document.getElementById('deviceSearch')?.value || '').toLowerCase();
-    const filtered = this.devices.filter(d=>!q || d.name.toLowerCase().includes(q) || d.id.toLowerCase().includes(q));
-    list.innerHTML = filtered.map(d=>`
-      <div class="device-row ${d.connected?'connected':''}" data-id="${d.id}" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border:1px solid var(--line);border-radius:14px;margin-bottom:8px;background:var(--surface-2)">
-        <div><div style="font-weight:600;font-size:13px">${d.name}</div><div style="font-size:10px;color:var(--dim)">${d.id.slice(0,12)} · ${d.rssi} dBm${d.battery!=null?' · '+d.battery+'%':''}</div></div>
-        <button class="pill-btn" onclick="BluetoothFixes.${d.connected?'disconnect':'connect'}('${d.id}')">${d.connected?'Disconnect':'Connect'}</button>
-      </div>`).join('') || '<div style="padding:16px;color:var(--dim);font-size:13px">No devices yet. Tap Scan.</div>';
-  }
-};
-
-// Override old scan button if exists
-document.addEventListener('DOMContentLoaded', ()=>{
-  const scanBtn = document.getElementById('scanDevicesBtn') || document.querySelector('[data-action="scan-ble"]');
-  if(scanBtn) scanBtn.addEventListener('click', async ()=>{ try{ await BluetoothFixes.scan(); } catch(e){ toast(e.message);} });
-  const search = document.getElementById('deviceSearch');
-  if(search) search.addEventListener('input', ()=>BluetoothFixes.render());
-});
-
-// 2. LIVE MAP + SEARCH FIXES
-window.LiveMapFix = {
-  init(){
-    if(!window.liveMap) { setTimeout(()=>this.init(), 500); return; }
-    this.setupSearch();
-  },
-  setupSearch(){
-    const input = document.getElementById('liveSearch') || document.getElementById('fsActivitySelect')?.parentElement?.querySelector('input');
-    const realInput = document.getElementById('liveSearch');
-    if(!realInput) {
-      // inject search box
-      const wrap = document.getElementById('mapWrap');
-      if(wrap && !document.getElementById('liveSearch')){
-        const box = document.createElement('input');
-        box.id='liveSearch'; box.placeholder='Search activities, routes, parks...'; box.style='position:absolute;top:12px;left:12px;right:12px;z-index:500;padding:12px 14px;border-radius:12px;border:1px solid var(--line-strong);background:var(--map-chip);backdrop-filter:blur(12px);color:var(--text)';
-        wrap.style.position='relative';
-        wrap.prepend(box);
-        box.addEventListener('input', (e)=>this.filter(e.target.value));
+    const st = S();
+    if (!st) { setStatus('❌ App state not ready'); return; }
+    if (hrv.length) st.hrv = hrv.reduce((a, b) => a + b, 0) / hrv.length;
+    if (rhr.length) st.rhr = rhr[rhr.length - 1];
+    if (hr.length) { hr.sort((a, b) => b.t - a.t); st.hr = hr[0].v; }
+    if (steps > 0) st.steps = Math.round(steps);
+    if (sleepMs > 0) st.sleep = +(sleepMs / 3600000).toFixed(1);
+    st.healthSync = { connected: true, lastSync: Date.now(), source: 'Apple Health (export.xml)' };
+    try { window.saveProfile && window.saveProfile(); } catch (_) {}
+    try { window.renderAll && window.renderAll(); } catch (_) {}
+    // Persist snapshot to Supabase
+    try {
+      if (window.supabaseAuth?.saveHealthSnapshot) {
+        await window.supabaseAuth.saveHealthSnapshot({
+          hrv: st.hrv, rhr: st.rhr, sleep: st.sleep, steps: st.steps,
+          source: 'apple_health_export', capturedAt: Date.now()
+        });
       }
+    } catch (e) { console.warn('[KEEL] health snapshot save:', e.message); }
+    setStatus(`✓ Imported — HRV ${st.hrv ? st.hrv.toFixed(0) + ' ms' : '—'}, Sleep ${st.sleep || '—'} h, RHR ${st.rhr || '—'} bpm, ${st.steps.toLocaleString()} steps`);
+    T('Apple Health imported ✓');
+    setTimeout(() => { document.getElementById('healthImportSheet')?.classList.remove('on'); }, 2400);
+  }
+  window.KEELHealthImport = importHealthFile;
+
+  /* ==============================================================
+     4. UI WIRING
+     ============================================================== */
+
+  document.getElementById('homeScanBtn')?.addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const original = btn.textContent;
+    btn.textContent = 'SCANNING…';
+    btn.disabled = true;
+    try { await BT.scan(); }
+    catch (err) { T('Bluetooth error: ' + (err.message || err)); }
+    finally { btn.textContent = original; btn.disabled = false; }
+  });
+
+  document.getElementById('homePhoneSyncBtn')?.addEventListener('click', () => {
+    document.getElementById('healthImportSheet')?.classList.add('on');
+  });
+
+  document.getElementById('homeShareBtn')?.addEventListener('click', async () => {
+    const connected = BT.devices.filter(d => d.connected);
+    if (!connected.length) { T('No connected devices to share'); return; }
+    const text = connected.map(d => `${d.name}${d.hr ? ' — ' + d.hr + ' BPM' : ''}${d.battery != null ? ' — ' + d.battery + '%' : ''}`).join('\n');
+    if (navigator.share) {
+      try { await navigator.share({ title: 'KEEL devices', text }); } catch (_) {}
     } else {
-      realInput.addEventListener('input', (e)=>this.filter(e.target.value));
+      try { await navigator.clipboard.writeText(text); T('Copied device list'); }
+      catch (_) { T(text); }
     }
-  },
-  filter(q){
-    const lc = q.toLowerCase();
-    // filter mock activities in state
-    if(window.state && window.state.liveFeed){
-      window.state.liveFeed = window.state.liveFeed.map(a=>({...a, hidden: lc && !a.name.toLowerCase().includes(lc)}));
-      if(window.renderLive) renderLive();
-    }
-    // pan map to first match
-    if(window.liveMap && window.liveMarkers){
-      const match = window.liveMarkers?.find(m=>m.name?.toLowerCase().includes(lc));
-      if(match) liveMap.setView([match.lat, match.lng], 14);
-    }
-  }
-};
+  });
 
-// 3. REAL SIGN-UP (consent-based, no extraction)
-window.AuthFix = {
-  init(){
-    const overlay = document.getElementById('loginOverlay');
-    if(!overlay) return;
-    // Replace innerHTML with real form
-    const formContainer = overlay.querySelector('.login-card') || overlay;
-    if(formContainer.dataset.fixed) return;
-    formContainer.dataset.fixed='1';
-    // Inject proper form if not present
-    if(!document.getElementById('realSignupForm')){
-      const html = `
-      <div id="realSignupForm" style="width:100%;max-width:360px;margin:auto;padding:24px">
-        <h2 style="font-size:22px;margin:0 0 6px">Create your KEEL account</h2>
-        <p style="font-size:12px;color:var(--dim);margin:0 0 18px">We only use what you type. No hidden extraction from your phone.</p>
-        <input id="suName" placeholder="Full name" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px"/>
-        <input id="suEmail" type="email" placeholder="Email address" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px"/>
-        <input id="suPass" type="password" placeholder="Password (min 8 chars)" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:10px"/>
-        <input id="suPass2" type="password" placeholder="Confirm password" style="width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--text);margin-bottom:14px"/>
-        <label style="display:flex;gap:8px;font-size:11px;color:var(--dim);margin-bottom:14px"><input type="checkbox" id="suConsent"/> I consent to storing my email/name for login and understand health data is optional and requires separate permission.</label>
-        <button id="suSubmit" style="width:100%;padding:14px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Sign Up</button>
-        <div style="text-align:center;margin-top:12px"><button id="suToLogin" style="background:none;border:0;color:var(--dim);font-size:12px">Already have account? Log in</button></div>
-        <div id="suError" style="color:var(--live);font-size:11px;margin-top:10px;display:none"></div>
-      </div>`;
-      const target = document.getElementById('loginContent') || overlay;
-      target.insertAdjacentHTML('afterbegin', html);
-      document.getElementById('suSubmit').addEventListener('click', ()=>this.signup());
-      document.getElementById('suToLogin').addEventListener('click', ()=>this.showLogin());
+  document.getElementById('healthChooseFile')?.addEventListener('click', () => {
+    document.getElementById('healthFileInput')?.click();
+  });
+  document.getElementById('healthFileInput')?.addEventListener('change', async (e) => {
+    const f = e.target.files?.[0];
+    if (f) await importHealthFile(f);
+    e.target.value = '';
+  });
+  document.getElementById('healthImportClose')?.addEventListener('click', () => {
+    document.getElementById('healthImportSheet')?.classList.remove('on');
+  });
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#menuHealthData')) {
+      e.stopPropagation();
+      document.getElementById('healthImportSheet')?.classList.add('on');
+      return;
     }
-  },
-  signup(){
-    const name=document.getElementById('suName').value.trim();
-    const email=document.getElementById('suEmail').value.trim().toLowerCase();
-    const p=document.getElementById('suPass').value;
-    const p2=document.getElementById('suPass2').value;
-    const consent=document.getElementById('suConsent').checked;
-    const err=document.getElementById('suError');
-    if(!name || !email || !p) { err.style.display='block'; err.textContent='Please fill all fields.'; return; }
-    if(!/^[^@]+@[^@]+\.[^@]+$/.test(email)) { err.style.display='block'; err.textContent='Invalid email.'; return; }
-    if(p.length<8) { err.style.display='block'; err.textContent='Password must be at least 8 characters.'; return; }
-    if(p!==p2) { err.style.display='block'; err.textContent='Passwords do not match.'; return; }
-    if(!consent) { err.style.display='block'; err.textContent='Please accept consent to continue.'; return; }
-    const user={ name, email, passHash: btoa(p).slice(0,24), createdAt: new Date().toISOString(), consentAt: new Date().toISOString() };
-    localStorage.setItem('keel-user', JSON.stringify(user));
-    localStorage.setItem('keel-auth', JSON.stringify({loggedIn:true, email}));
-    if(window.state){ state.isLoggedIn=true; state.user=user; }
-    toast('Account created for '+name);
-    document.getElementById('loginOverlay')?.classList.remove('on');
-    if(window.boot) setTimeout(()=>{ if(!state.health?.completed) showOnboard(); }, 400);
-  },
-  showLogin(){
-    toast('Use your email and password to log in — demo checks local storage');
-  }
-};
+    if (e.target.closest('.perm-btn[data-perm="fitness"]')) {
+      e.stopPropagation();
+      e.preventDefault();
+      document.getElementById('healthImportSheet')?.classList.add('on');
+    }
+  }, true);
 
-// 4. HEALTH PERMISSION FLOW (Apple Health / smartwatch)
-window.HealthPermissionFix = {
-  async request(){
-    // Show explicit permission modal
-    const existing = document.getElementById('healthPermModal');
-    if(existing) existing.remove();
-    const modal = document.createElement('div');
-    modal.id='healthPermModal';
-    modal.style='position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px';
-    modal.innerHTML=`
-      <div style="background:var(--surface);border:1px solid var(--line-strong);border-radius:24px;padding:24px;max-width:360px;width:100%">
-        <h3 style="margin:0 0 8px;font-size:18px">Allow Health Data Access?</h3>
-        <p style="font-size:13px;color:var(--dim);line-height:1.5;margin:0 0 16px">KEEL wants to read your health data from your phone and Apple Watch or smartwatch to adapt training.<br><br><strong style="color:var(--text)">What we access:</strong> Heart rate, steps, sleep, workout history.<br><strong style="color:var(--text)">How:</strong> Through Apple HealthKit on iPhone / Health Connect on Android. Your watch syncs to the phone first — we never read the watch directly.<br><br>This is optional. You can revoke anytime in Settings.</p>
-        <div style="display:flex;gap:10px"><button id="hpDeny" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--surface-2);color:var(--text)">Not Now</button><button id="hpAllow" style="flex:2;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Allow Access</button></div>
-        <div style="margin-top:10px;font-size:10px;color:var(--dim-2);text-align:center">iOS will show a system permission sheet next if the native app is installed.</div>
-      </div>`;
-    document.body.appendChild(modal);
-    modal.querySelector('#hpDeny').onclick=()=>{ modal.remove(); toast('Health sync skipped'); };
-    modal.querySelector('#hpAllow').onclick=async()=>{
-      modal.remove();
-      try {
-        // Try capacitor health plugin if available
-        if(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Health){
-          const Health = window.Capacitor.Plugins.Health;
-          const result = await Health.requestAuthorization({read: ['heart_rate','steps','sleep','workout']});
-          console.log('Health auth', result);
-        } else {
-          // Fallback: simulate permission granted and store flag
-          console.log('Simulating HealthKit permission in web preview');
-        }
-        localStorage.setItem('keel-health-permission','granted');
-        if(window.state){ state.health.permission='granted'; state.health.completed=true; if(window.saveProfile) saveProfile(); }
-        toast('Health permission granted — syncing...');
-        // Trigger sync
-        if(window.syncHealthData) syncHealthData();
-      } catch(e){ toast('Health permission denied: '+e.message); localStorage.setItem('keel-health-permission','denied'); }
-    };
-  }
-};
+  // Auth tabs & form
+  document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => setAuthMode(tab.dataset.mode));
+  });
+  document.getElementById('authForm')?.addEventListener('submit', handleAuthSubmit);
 
-// Hook health button
-document.addEventListener('DOMContentLoaded', ()=>{
-  setTimeout(()=>{
-    AuthFix.init();
-    LiveMapFix.init();
-    const healthBtn = document.getElementById('connectHealthBtn') || document.querySelector('[data-action="connect-health"]');
-    if(healthBtn) healthBtn.addEventListener('click', ()=>HealthPermissionFix.request());
-    // Also hook the onboarding health toggle
-    const onboardHealth = document.getElementById('obHealthBtn');
-    if(onboardHealth) onboardHealth.addEventListener('click', ()=>HealthPermissionFix.request());
-  }, 800);
-});
+  setTimeout(async () => {
+    const statusEl = document.getElementById('homeBluetoothStatus');
+    if (!statusEl) return;
+    if (!BT.supported) {
+      statusEl.textContent = 'Safari/iOS: use "IMPORT APPLE HEALTH". Chrome/Edge: tap SCAN FOR DEVICE.';
+    } else if (await BT.availability()) {
+      statusEl.textContent = 'Bluetooth ready — tap SCAN FOR DEVICE';
+    } else {
+      statusEl.textContent = 'Bluetooth is OFF — turn it on in Settings';
+    }
+  }, 1200);
+
+  console.log('KEEL v3.0 loaded — Apple Health import, real Bluetooth, working location, Supabase auth');
+})();
 </script>
-<!-- === END FIXES === -->
 
-
-
+<!-- ============================================================
+     HASH ROUTER — makes manifest shortcuts (#live, #you) work
+     ============================================================ -->
 <script>
-// Auto-configure Supabase
-localStorage.setItem('keel-supabase-url', 'https://xljdbzkzslyzonfovkbo.supabase.co');
-localStorage.setItem('keel-supabase-key', 'sb_publishable_3KuVZltsOKHpMgh1x7ZSTg_ZuRKtmZr');
+(function(){
+  const validTabs = ['home','train','live','you','menu'];
+  function applyHashRoute(){
+    const h = (location.hash || '').replace('#','').trim();
+    if (validTabs.includes(h) && typeof window.goTab === 'function') {
+      window.goTab(h);
+    }
+  }
+  window.addEventListener('hashchange', applyHashRoute);
+  window.addEventListener('load', () => setTimeout(applyHashRoute, 400));
+})();
 </script>
+
+<!-- Supabase module — runs last -->
 <script type="module">
-import { signUpWithKeel, signInWithKeel, supabase } from './supabaseClient.js'
-window.supabaseAuth = { signUpWithKeel, signInWithKeel, supabase }
-if(window.AuthFix){
-  const origSignup = window.AuthFix.signup;
-  window.AuthFix.signup = async function(){
-    const name=document.getElementById('suName')?.value.trim();
-    const email=document.getElementById('suEmail')?.value.trim().toLowerCase();
-    const p=document.getElementById('suPass')?.value;
-    const p2=document.getElementById('suPass2')?.value;
-    const consent=document.getElementById('suConsent')?.checked;
-    const err=document.getElementById('suError');
-    if(!name||!email||!p){ err.style.display='block'; err.textContent='Fill all fields'; return; }
-    if(p.length<8){ err.style.display='block'; err.textContent='Password min 8 chars'; return; }
-    if(p!==p2){ err.style.display='block'; err.textContent='Passwords no match'; return; }
-    if(!consent){ err.style.display='block'; err.textContent='Accept consent'; return; }
-    try{
-      err.style.display='none';
-      const btn=document.getElementById('suSubmit'); btn.textContent='Creating...'; btn.disabled=true;
-      await signUpWithKeel({name,email,password:p});
-      // log health consent if granted
-      try { const perm=localStorage.getItem('keel-health-permission'); if(perm) await supabase.from('health_consents').insert({user_id:(await supabase.auth.getUser()).data.user?.id, permission:perm, source:'manual'}) } catch(e){}
-      alert('Account created for '+name+'! Check email to confirm if required, then log in.');
-      document.getElementById('loginOverlay')?.classList.remove('on');
-      btn.textContent='Sign Up'; btn.disabled=false;
-    } catch(e){ err.style.display='block'; err.textContent=e.message; document.getElementById('suSubmit').textContent='Sign Up'; document.getElementById('suSubmit').disabled=false; }
-  }
-}
-console.log('KEEL Supabase ready:', 'https://xljdbzkzslyzonfovkbo.supabase.co')
-</script>
+import { signUpWithKeel, signInWithKeel, signOutKeel, getSession, getCurrentUser, logHealthConsent, saveHealthSnapshot, saveSessionRecord, onAuthChange, supabase } from './supabaseClient.js';
+window.supabaseAuth = { signUpWithKeel, signInWithKeel, signOutKeel, getSession, getCurrentUser, logHealthConsent, saveHealthSnapshot, saveSessionRecord, onAuthChange, supabase };
+console.log('[KEEL] Supabase auth helpers loaded');
 
-<script>
-// === LOCATION FIX FOR VERCEL + iOS ===
-(function(){
-  const origRequestLocation = window.requestLocation;
-  if(!origRequestLocation) return;
-
-  window.requestLocation = function(fromPerm){
-    // iOS Safari requires user gesture - ensure we have it
-    console.log('KEEL location request, fromPerm:', fromPerm);
-    if (!navigator.geolocation) {
-      window.state && (window.state.geo.status='denied');
-      if(window.updateGeoUI) updateGeoUI();
-      alert('Geolocation not supported on this device');
-      return;
+// If already signed in via Supabase, honour that session
+(async () => {
+  try {
+    const session = await getSession();
+    if (session && session.user) {
+      try { localStorage.setItem('keel-logged-in', 'true'); } catch(_) {}
+      if (window.state) window.state.isLoggedIn = true;
+      const overlay = document.getElementById('loginOverlay');
+      if (overlay) overlay.classList.remove('on');
+      if (window.renderAll) window.renderAll();
     }
-    // Show requesting UI
-    if(window.state){
-      window.state.geo.status='requesting';
-      if(window.updateGeoUI) updateGeoUI();
-      if(window.renderLive) renderLive();
-    }
-    // Real request with better error handling for iOS
-    navigator.geolocation.getCurrentPosition(
-      (pos)=>{
-        console.log('KEEL got position', pos.coords);
-        if(!window.state) return;
-        window.state.geo = {
-          status:'granted',
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          acc: pos.coords.accuracy,
-          error:null
-        };
-        window.state.consent && (window.state.consent.location=true);
-        try{ window.saveProfile && saveProfile(); }catch(e){}
-        if(window.liveMap){
-          window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
-          if(window.L && window.userMarker){ /* update marker handled by original success */ }
-        }
-        if(window.updateGeoUI) updateGeoUI();
-        if(window.renderLive) renderLive();
-        if(window.renderPerms) renderPerms();
-        if(window.startAreaScan) startAreaScan();
-      },
-      (err)=>{
-        console.error('KEEL geo error', err);
-        if(!window.state) return;
-        let msg = err.message || 'Location denied';
-        if(err.code===1) msg='Location permission denied. On iPhone: Settings > Privacy > Location Services > Safari Websites > Allow While Using App';
-        if(err.code===2) msg='Location unavailable - check GPS';
-        if(err.code===3) msg='Location timeout - try outdoors';
-        window.state.geo.status='denied';
-        window.state.geo.error=msg;
-        if(window.updateGeoUI) updateGeoUI();
-        if(window.renderLive) renderLive();
-        if(window.renderPerms) renderPerms();
-        // Show overlay with enable button
-        let overlay = document.getElementById('locationFixOverlay');
-        if(!overlay){
-          overlay = document.createElement('div');
-          overlay.id='locationFixOverlay';
-          overlay.style='position:absolute;top:50%;left:16px;right:16px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:1000;text-align:center';
-          const liveScreen = document.getElementById('screen-live') || document.body;
-          liveScreen.appendChild(overlay);
-        }
-        overlay.innerHTML = `
-          <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
-          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5">${msg}</div>
-          <button id="fixLocBtn" style="width:100%;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Tap to Enable Location</button>
-          <div style="font-size:10px;color:var(--dim-2);margin-top:10px">Must tap - iOS blocks auto location</div>
-        `;
-        document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); window.requestLocation(true); });
-      },
-      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
-    );
-  };
-
-  // Add enable button to LIVE screen if still LOCATING after 3 sec
-  setTimeout(()=>{
-    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
-      const screen = document.getElementById('screen-live');
-      if(screen && !document.getElementById('fixLocBtn')){
-        const btn = document.createElement('button');
-        btn.id='enableLocationBtn';
-        btn.textContent='Enable Location - Tap Here';
-        btn.style='position:absolute;top:120px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5)';
-        btn.onclick=()=>{ btn.remove(); window.requestLocation(true); };
-        screen.appendChild(btn);
-      }
-    }
-  }, 3000);
+  } catch(e) { console.warn('[KEEL] session restore:', e.message); }
 })();
 </script>
 
-
-<script>
-// === LOCATION FIX FOR VERCEL + iOS ===
-(function(){
-  const origRequestLocation = window.requestLocation;
-  if(!origRequestLocation) return;
-
-  window.requestLocation = function(fromPerm){
-    // iOS Safari requires user gesture - ensure we have it
-    console.log('KEEL location request, fromPerm:', fromPerm);
-    if (!navigator.geolocation) {
-      window.state && (window.state.geo.status='denied');
-      if(window.updateGeoUI) updateGeoUI();
-      alert('Geolocation not supported on this device');
-      return;
-    }
-    // Show requesting UI
-    if(window.state){
-      window.state.geo.status='requesting';
-      if(window.updateGeoUI) updateGeoUI();
-      if(window.renderLive) renderLive();
-    }
-    // Real request with better error handling for iOS
-    navigator.geolocation.getCurrentPosition(
-      (pos)=>{
-        console.log('KEEL got position', pos.coords);
-        if(!window.state) return;
-        window.state.geo = {
-          status:'granted',
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          acc: pos.coords.accuracy,
-          error:null
-        };
-        window.state.consent && (window.state.consent.location=true);
-        try{ window.saveProfile && saveProfile(); }catch(e){}
-        if(window.liveMap){
-          window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
-          if(window.L && window.userMarker){ /* update marker handled by original success */ }
-        }
-        if(window.updateGeoUI) updateGeoUI();
-        if(window.renderLive) renderLive();
-        if(window.renderPerms) renderPerms();
-        if(window.startAreaScan) startAreaScan();
-      },
-      (err)=>{
-        console.error('KEEL geo error', err);
-        if(!window.state) return;
-        let msg = err.message || 'Location denied';
-        if(err.code===1) msg='Location permission denied. On iPhone: Settings > Privacy > Location Services > Safari Websites > Allow While Using App';
-        if(err.code===2) msg='Location unavailable - check GPS';
-        if(err.code===3) msg='Location timeout - try outdoors';
-        window.state.geo.status='denied';
-        window.state.geo.error=msg;
-        if(window.updateGeoUI) updateGeoUI();
-        if(window.renderLive) renderLive();
-        if(window.renderPerms) renderPerms();
-        // Show overlay with enable button
-        let overlay = document.getElementById('locationFixOverlay');
-        if(!overlay){
-          overlay = document.createElement('div');
-          overlay.id='locationFixOverlay';
-          overlay.style='position:absolute;top:50%;left:16px;right:16px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:1000;text-align:center';
-          const liveScreen = document.getElementById('screen-live') || document.body;
-          liveScreen.appendChild(overlay);
-        }
-        overlay.innerHTML = `
-          <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
-          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5">${msg}</div>
-          <button id="fixLocBtn" style="width:100%;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Tap to Enable Location</button>
-          <div style="font-size:10px;color:var(--dim-2);margin-top:10px">Must tap - iOS blocks auto location</div>
-        `;
-        document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); window.requestLocation(true); });
-      },
-      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
-    );
-  };
-
-  // Add enable button to LIVE screen if still LOCATING after 3 sec
-  setTimeout(()=>{
-    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
-      const screen = document.getElementById('screen-live');
-      if(screen && !document.getElementById('fixLocBtn')){
-        const btn = document.createElement('button');
-        btn.id='enableLocationBtn';
-        btn.textContent='Enable Location - Tap Here';
-        btn.style='position:absolute;top:120px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5)';
-        btn.onclick=()=>{ btn.remove(); window.requestLocation(true); };
-        screen.appendChild(btn);
-      }
-    }
-  }, 3000);
-})();
-</script>
-
-
-
-
-<script>
-// Auto-configure Supabase
-localStorage.setItem('keel-supabase-url', 'https://xljdbzkzslyzonfovkbo.supabase.co');
-localStorage.setItem('keel-supabase-key', 'sb_publishable_3KuVZltsOKHpMgh1x7ZSTg_ZuRKtmZr');
-</script>
-<script type="module">
-import { signUpWithKeel, signInWithKeel, supabase } from './supabaseClient.js'
-window.supabaseAuth = { signUpWithKeel, signInWithKeel, supabase }
-if(window.AuthFix){
-  const origSignup = window.AuthFix.signup;
-  window.AuthFix.signup = async function(){
-    const name=document.getElementById('suName')?.value.trim();
-    const email=document.getElementById('suEmail')?.value.trim().toLowerCase();
-    const p=document.getElementById('suPass')?.value;
-    const p2=document.getElementById('suPass2')?.value;
-    const consent=document.getElementById('suConsent')?.checked;
-    const err=document.getElementById('suError');
-    if(!name||!email||!p){ err.style.display='block'; err.textContent='Fill all fields'; return; }
-    if(p.length<8){ err.style.display='block'; err.textContent='Password min 8 chars'; return; }
-    if(p!==p2){ err.style.display='block'; err.textContent='Passwords no match'; return; }
-    if(!consent){ err.style.display='block'; err.textContent='Accept consent'; return; }
-    try{
-      err.style.display='none';
-      const btn=document.getElementById('suSubmit'); btn.textContent='Creating...'; btn.disabled=true;
-      await signUpWithKeel({name,email,password:p});
-      // log health consent if granted
-      try { const perm=localStorage.getItem('keel-health-permission'); if(perm) await supabase.from('health_consents').insert({user_id:(await supabase.auth.getUser()).data.user?.id, permission:perm, source:'manual'}) } catch(e){}
-      alert('Account created for '+name+'! Check email to confirm if required, then log in.');
-      document.getElementById('loginOverlay')?.classList.remove('on');
-      btn.textContent='Sign Up'; btn.disabled=false;
-    } catch(e){ err.style.display='block'; err.textContent=e.message; document.getElementById('suSubmit').textContent='Sign Up'; document.getElementById('suSubmit').disabled=false; }
-  }
-}
-console.log('KEEL Supabase ready:', 'https://xljdbzkzslyzonfovkbo.supabase.co')
-</script>
-
-<script>
-// === LOCATION FIX FOR VERCEL + iOS ===
-(function(){
-  const origRequestLocation = window.requestLocation;
-  if(!origRequestLocation) return;
-
-  window.requestLocation = function(fromPerm){
-    // iOS Safari requires user gesture - ensure we have it
-    console.log('KEEL location request, fromPerm:', fromPerm);
-    if (!navigator.geolocation) {
-      window.state && (window.state.geo.status='denied');
-      if(window.updateGeoUI) updateGeoUI();
-      alert('Geolocation not supported on this device');
-      return;
-    }
-    // Show requesting UI
-    if(window.state){
-      window.state.geo.status='requesting';
-      if(window.updateGeoUI) updateGeoUI();
-      if(window.renderLive) renderLive();
-    }
-    // Real request with better error handling for iOS
-    navigator.geolocation.getCurrentPosition(
-      (pos)=>{
-        console.log('KEEL got position', pos.coords);
-        if(!window.state) return;
-        window.state.geo = {
-          status:'granted',
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          acc: pos.coords.accuracy,
-          error:null
-        };
-        window.state.consent && (window.state.consent.location=true);
-        try{ window.saveProfile && saveProfile(); }catch(e){}
-        if(window.liveMap){
-          window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
-          if(window.L && window.userMarker){ /* update marker handled by original success */ }
-        }
-        if(window.updateGeoUI) updateGeoUI();
-        if(window.renderLive) renderLive();
-        if(window.renderPerms) renderPerms();
-        if(window.startAreaScan) startAreaScan();
-      },
-      (err)=>{
-        console.error('KEEL geo error', err);
-        if(!window.state) return;
-        let msg = err.message || 'Location denied';
-        if(err.code===1) msg='Location permission denied. On iPhone: Settings > Privacy > Location Services > Safari Websites > Allow While Using App';
-        if(err.code===2) msg='Location unavailable - check GPS';
-        if(err.code===3) msg='Location timeout - try outdoors';
-        window.state.geo.status='denied';
-        window.state.geo.error=msg;
-        if(window.updateGeoUI) updateGeoUI();
-        if(window.renderLive) renderLive();
-        if(window.renderPerms) renderPerms();
-        // Show overlay with enable button
-        let overlay = document.getElementById('locationFixOverlay');
-        if(!overlay){
-          overlay = document.createElement('div');
-          overlay.id='locationFixOverlay';
-          overlay.style='position:absolute;top:50%;left:16px;right:16px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:1000;text-align:center';
-          const liveScreen = document.getElementById('screen-live') || document.body;
-          liveScreen.appendChild(overlay);
-        }
-        overlay.innerHTML = `
-          <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
-          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5">${msg}</div>
-          <button id="fixLocBtn" style="width:100%;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Tap to Enable Location</button>
-          <div style="font-size:10px;color:var(--dim-2);margin-top:10px">Must tap - iOS blocks auto location</div>
-        `;
-        document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); window.requestLocation(true); });
-      },
-      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
-    );
-  };
-
-  // Add enable button to LIVE screen if still LOCATING after 3 sec
-  setTimeout(()=>{
-    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
-      const screen = document.getElementById('screen-live');
-      if(screen && !document.getElementById('fixLocBtn')){
-        const btn = document.createElement('button');
-        btn.id='enableLocationBtn';
-        btn.textContent='Enable Location - Tap Here';
-        btn.style='position:absolute;top:120px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5)';
-        btn.onclick=()=>{ btn.remove(); window.requestLocation(true); };
-        screen.appendChild(btn);
-      }
-    }
-  }, 3000);
-})();
-</script>
-
-
-<script>
-// === LOCATION FIX FOR VERCEL + iOS ===
-(function(){
-  const origRequestLocation = window.requestLocation;
-  if(!origRequestLocation) return;
-
-  window.requestLocation = function(fromPerm){
-    // iOS Safari requires user gesture - ensure we have it
-    console.log('KEEL location request, fromPerm:', fromPerm);
-    if (!navigator.geolocation) {
-      window.state && (window.state.geo.status='denied');
-      if(window.updateGeoUI) updateGeoUI();
-      alert('Geolocation not supported on this device');
-      return;
-    }
-    // Show requesting UI
-    if(window.state){
-      window.state.geo.status='requesting';
-      if(window.updateGeoUI) updateGeoUI();
-      if(window.renderLive) renderLive();
-    }
-    // Real request with better error handling for iOS
-    navigator.geolocation.getCurrentPosition(
-      (pos)=>{
-        console.log('KEEL got position', pos.coords);
-        if(!window.state) return;
-        window.state.geo = {
-          status:'granted',
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-          acc: pos.coords.accuracy,
-          error:null
-        };
-        window.state.consent && (window.state.consent.location=true);
-        try{ window.saveProfile && saveProfile(); }catch(e){}
-        if(window.liveMap){
-          window.liveMap.setView([pos.coords.latitude, pos.coords.longitude], 14);
-          if(window.L && window.userMarker){ /* update marker handled by original success */ }
-        }
-        if(window.updateGeoUI) updateGeoUI();
-        if(window.renderLive) renderLive();
-        if(window.renderPerms) renderPerms();
-        if(window.startAreaScan) startAreaScan();
-      },
-      (err)=>{
-        console.error('KEEL geo error', err);
-        if(!window.state) return;
-        let msg = err.message || 'Location denied';
-        if(err.code===1) msg='Location permission denied. On iPhone: Settings > Privacy > Location Services > Safari Websites > Allow While Using App';
-        if(err.code===2) msg='Location unavailable - check GPS';
-        if(err.code===3) msg='Location timeout - try outdoors';
-        window.state.geo.status='denied';
-        window.state.geo.error=msg;
-        if(window.updateGeoUI) updateGeoUI();
-        if(window.renderLive) renderLive();
-        if(window.renderPerms) renderPerms();
-        // Show overlay with enable button
-        let overlay = document.getElementById('locationFixOverlay');
-        if(!overlay){
-          overlay = document.createElement('div');
-          overlay.id='locationFixOverlay';
-          overlay.style='position:absolute;top:50%;left:16px;right:16px;transform:translateY(-50%);background:var(--surface);border:1px solid var(--line-strong);border-radius:20px;padding:20px;z-index:1000;text-align:center';
-          const liveScreen = document.getElementById('screen-live') || document.body;
-          liveScreen.appendChild(overlay);
-        }
-        overlay.innerHTML = `
-          <div style="font-size:15px;font-weight:700;margin-bottom:8px">Enable Location</div>
-          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;line-height:1.5">${msg}</div>
-          <button id="fixLocBtn" style="width:100%;padding:12px;border-radius:12px;background:var(--accent);color:var(--accent-ink);font-weight:700;border:0">Tap to Enable Location</button>
-          <div style="font-size:10px;color:var(--dim-2);margin-top:10px">Must tap - iOS blocks auto location</div>
-        `;
-        document.getElementById('fixLocBtn')?.addEventListener('click', ()=>{ overlay.remove(); window.requestLocation(true); });
-      },
-      { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
-    );
-  };
-
-  // Add enable button to LIVE screen if still LOCATING after 3 sec
-  setTimeout(()=>{
-    if(window.state && window.state.geo && window.state.geo.status!=='granted'){
-      const screen = document.getElementById('screen-live');
-      if(screen && !document.getElementById('fixLocBtn')){
-        const btn = document.createElement('button');
-        btn.id='enableLocationBtn';
-        btn.textContent='Enable Location - Tap Here';
-        btn.style='position:absolute;top:120px;left:20px;right:20px;z-index:600;padding:16px;border-radius:14px;background:#C9F24E;color:#0A0C05;font-weight:800;border:0;box-shadow:0 10px 30px rgba(0,0,0,.5)';
-        btn.onclick=()=>{ btn.remove(); window.requestLocation(true); };
-        screen.appendChild(btn);
-      }
-    }
-  }, 3000);
-})();
-</script>
-<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
-</body></html>
+</body>
+</html>
