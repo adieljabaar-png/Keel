@@ -1,70 +1,284 @@
-// supabaseClient.js - KEEL v1.5 with location sharing + health profiles
+/* ============================================================
+   KEEL — Supabase client v3.0.1
+   Reads URL + anon key from localStorage (set by index.html).
+   Safe to import even if storage is empty (falls back with warning).
+
+   v3.0.1 changes
+   --------------
+   - signUpWithKeel now returns `requiresEmailConfirmation`
+   - signInWithKeel ensures a profile row exists (fixes the
+     "sign up → confirm email → sign in" flow where the original
+     unauth upsert was blocked by RLS)
+   - Added resendConfirmation(email)
+   - Added hasActiveSession()
+   ============================================================ */
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0'
 
-export const SUPABASE_URL = 'https://xljdbzkzslyzonfovkbo.supabase.co'
-export const SUPABASE_ANON_KEY = 'sb_publishable_3KuVZltsOKHpMgh1x7ZSTg_ZuRKtmZr'
+const PLACEHOLDER_URL = 'https://xljdbzkzslyzonfovkbo.supabase.co'
+const PLACEHOLDER_KEY = 'sb_publishable_3KuVZltsOKHpMgh1x7ZSTg_ZuRKtmZr'
+const APP_VERSION = '3.0.2'
+// Real project is the fallback; localStorage keel-supabase-url/key (seeded by index.html) can override it.
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+function resolveConfig() {
+  let url = PLACEHOLDER_URL
+  let key = PLACEHOLDER_KEY
+  try {
+    const sUrl = localStorage.getItem('keel-supabase-url')
+    const sKey = localStorage.getItem('keel-supabase-key')
+    if (sUrl && /^https:\/\//.test(sUrl)) url = sUrl
+    if (sKey && sKey.length > 20) key = sKey
+  } catch (_) {
+    /* storage blocked (Safari private mode) — use placeholders */
+  }
+  return { url, key }
+}
 
-export async function signUpWithKeel({name, email, password}){
-  const { data, error } = await supabase.auth.signUp({
-    email, password,
-    options: { data: { full_name: name, consent_at: new Date().toISOString() } }
-  })
-  if(error) throw error
-  if(data.user){
-    try { 
-      await supabase.from('profiles').upsert({ 
-        id: data.user.id, 
-        email, 
-        full_name: name, 
-        share_location: false,
-        created_at: new Date().toISOString() 
-      }) 
-    } catch(e){ console.warn('profile upsert', e) }
+const { url, key } = resolveConfig()
+
+if (url === PLACEHOLDER_URL || key === PLACEHOLDER_KEY) {
+  console.warn(
+    '[KEEL] Supabase is not configured. ' +
+    'Set localStorage.keel-supabase-url and keel-supabase-key before importing this module.'
+  )
+}
+
+export const supabase = createClient(url, key, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: 'keel-auth-session'
+  }
+})
+
+/* ============================================================
+   INTERNAL HELPERS
+   ============================================================ */
+
+function defaultDisplayName(user) {
+  const meta = user?.user_metadata || {}
+  if (meta.full_name) return meta.full_name
+  if (user?.email) return user.email.split('@')[0]
+  return 'KEEL user'
+}
+
+/**
+ * Idempotent profile row creation. Safe to call multiple times.
+ * Works whether or not the caller is signed in (only succeeds when
+ * a valid JWT is present, which matches the RLS policy).
+ */
+async function ensureProfileRow(user, explicitName) {
+  if (!user) return null
+  const row = {
+    id: user.id,
+    email: user.email,
+    full_name: explicitName || defaultDisplayName(user),
+    created_at: new Date().toISOString()
+  }
+  const { data, error } = await supabase
+    .from('profiles')
+    .upsert(row, { onConflict: 'id' })
+    .select()
+    .single()
+
+  if (error) {
+    console.warn('[KEEL] profile upsert failed (table may not exist yet):', error.message)
+    return null
   }
   return data
 }
 
-export async function signInWithKeel(email, password){
-  const { data, error } = await supabase.auth.signInWithPassword({email, password})
-  if(error) throw error
+/* ============================================================
+   AUTH
+   ============================================================ */
+
+/**
+ * Create a new account.
+ *
+ * Returns an object that includes `requiresEmailConfirmation`.
+ *  - false  → the user is signed in immediately (confirmation OFF)
+ *  - true   → the user must confirm via email link, THEN sign in
+ *
+ * Callers should check this flag rather than assuming auth success:
+ *
+ *   const res = await signUpWithKeel({...})
+ *   if (res.requiresEmailConfirmation) { showBannerToUser(); return }
+ *   // otherwise treat as signed in
+ */
+export async function signUpWithKeel({ name, email, password }) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: name,
+        consent_at: new Date().toISOString(),
+        app_version: APP_VERSION
+      }
+    }
+  })
+  if (error) throw error
+
+  // If a session is present, Supabase already signed us in → safe to write profile.
+  if (data.user && data.session) {
+    await ensureProfileRow(data.user, name)
+  }
+
+  return {
+    ...data,
+    requiresEmailConfirmation: !data.session
+  }
+}
+
+/**
+ * Sign in with email + password.
+ * Also ensures a profile row exists for users who signed up with
+ * email confirmation on (the original signup upsert would have been
+ * blocked by RLS since no JWT existed at that point).
+ */
+export async function signInWithKeel(email, password) {
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+  if (error) throw error
+  if (data.user) {
+    await ensureProfileRow(data.user)
+  }
   return data
 }
 
-export async function getSession(){
-  const { data } = await supabase.auth.getSession()
+export async function signOutKeel() {
+  const { error } = await supabase.auth.signOut()
+  if (error) throw error
+}
+
+export async function getSession() {
+  const { data, error } = await supabase.auth.getSession()
+  if (error) throw error
   return data.session
 }
 
+export async function hasActiveSession() {
+  try {
+    const session = await getSession()
+    return !!(session && session.user)
+  } catch (_) {
+    return false
+  }
+}
+
+export async function getCurrentUser() {
+  const { data, error } = await supabase.auth.getUser()
+  if (error) return null
+  return data.user
+}
+
+export async function resetPasswordForEmail(email, redirectTo) {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo })
+  if (error) throw error
+}
+
+/**
+ * Re-send a confirmation email for a user who signed up but never
+ * received / clicked the link. No-op if already confirmed.
+ */
+export async function resendConfirmation(email) {
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email
+  })
+  if (error) throw error
+}
+
+export function onAuthChange(callback) {
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
+    try { callback(event, session) } catch (e) { console.warn('[KEEL] auth listener error', e) }
+  })
+  return () => data.subscription.unsubscribe()
+}
+
+/* ============================================================
+   DATA WRITES (best-effort — never throw on the caller)
+   ============================================================ */
+
+export async function logHealthConsent(permission, source = 'manual') {
+  const user = await getCurrentUser()
+  if (!user) return null
+  const { data, error } = await supabase
+    .from('health_consents')
+    .insert({
+      user_id: user.id,
+      permission,
+      source,
+      created_at: new Date().toISOString()
+    })
+    .select()
+    .single()
+  if (error) { console.warn('[KEEL] consent log failed:', error.message); return null }
+  return data
+}
+
+export async function saveHealthSnapshot(snapshot) {
+  const user = await getCurrentUser()
+  if (!user) return null
+  const { data, error } = await supabase
+    .from('health_snapshots')
+    .insert({
+      user_id: user.id,
+      hrv: snapshot.hrv ?? null,
+      rhr: snapshot.rhr ?? null,
+      sleep_hours: snapshot.sleep ?? null,
+      steps: snapshot.steps ?? null,
+      source: snapshot.source || 'manual',
+      captured_at: new Date(snapshot.capturedAt || Date.now()).toISOString()
+    })
+    .select()
+    .single()
+  if (error) { console.warn('[KEEL] health snapshot failed:', error.message); return null }
+  return data
+}
+
+export async function saveSessionRecord(session) {
+  const user = await getCurrentUser()
+  if (!user) return null
+  const { data, error } = await supabase
+    .from('sessions')
+    .insert({
+      user_id: user.id,
+      type: session.type,
+      elapsed: session.elapsed,
+      distance_km: session.dist || 0,
+      kcal: session.kcal || 0,
+      broadcast: !!session.broadcast,
+      started_at: new Date(session.startedAt || Date.now()).toISOString()
+    })
+    .select()
+    .single()
+  if (error) { console.warn('[KEEL] session save failed:', error.message); return null }
+  return data
+}
+/* ============================================================
+   LOCATION SHARING + NEARBY (from v1, kept for maps)
+   ============================================================ */
+export const SUPABASE_URL = url
+export const SUPABASE_ANON_KEY = key
 export async function getProfile(userId){
   const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
   if(error) throw error
   return data
 }
-
 export async function updateLocationSharing(userId, {share, lat, lng}){
-  const { error } = await supabase.from('profiles').upsert({
-    id: userId,
-    share_location: share,
-    lat, lng,
-    last_seen: new Date().toISOString()
-  })
+  const { error } = await supabase.from('profiles').upsert({ id: userId, share_location: share, lat, lng, last_seen: new Date().toISOString() })
   if(error) throw error
 }
-
 export async function fetchNearbyPublicUsers(myLat, myLng, radiusKm=5){
   const { data, error } = await supabase.from('profiles').select('id, full_name, lat, lng, last_seen').eq('share_location', true)
   if(error) throw error
-  // Haversine filter client-side
-  const toRad = d => d*Math.PI/180
-  const R=6371
+  const toRad = d => d*Math.PI/180, R=6371
   return (data||[]).filter(p=>{
     if(p.lat==null || p.lng==null) return false
     const dLat=toRad(p.lat-myLat), dLng=toRad(p.lng-myLng)
     const a=Math.sin(dLat/2)**2 + Math.cos(toRad(myLat))*Math.cos(toRad(p.lat))*Math.sin(dLng/2)**2
-    const c=2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))
-    const dist=R*c
+    const dist=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))
     p._distKm = dist
     return dist <= radiusKm
   }).sort((a,b)=>a._distKm-b._distKm)
