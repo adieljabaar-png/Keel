@@ -11,7 +11,7 @@
       "headers": [
         {
           "key": "Permissions-Policy",
-          "value": "geolocation=(self), bluetooth=(self), camera=(), microphone=(), payment=()"
+          "value": "geolocation=(self), accelerometer=(self), gyroscope=(self), magnetometer=(self), camera=(), microphone=(), payment=()"
         },
         {
           "key": "X-Content-Type-Options",
