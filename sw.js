@@ -1,4 +1,4 @@
-/* Keel - sw.js
+/* Keel v1.0 - sw.js
  * Purpose:
  * 1. Save ALL user info / sessions to the DEVICE (IndexedDB in the SW + Cache Storage)
  *    so Keel works offline and no trip data is lost.
