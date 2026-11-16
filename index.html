@@ -37,6 +37,49 @@
       return null;
     }
   };
+
+function requestLocation() {
+  if (!navigator.geolocation) {
+    alert("Geolocation is not supported by your browser.");
+    return;
+  }
+
+  const options = {
+    enableHighAccuracy: true,
+    timeout: 10000,
+    maximumAge: 0
+  };
+
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      const lat = position.coords.latitude;
+      const lng = position.coords.longitude;
+      console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+      // Proceed with your tracking logic
+    },
+    (error) => {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          alert("Location permission was denied. Please enable it in your iPhone Settings.");
+          break;
+        case error.POSITION_UNAVAILABLE:
+          alert("Location information is unavailable.");
+          break;
+        case error.TIMEOUT:
+          alert("The request to get user location timed out.");
+          break;
+        default:
+          alert("An unknown error occurred.");
+          break;
+      }
+    },
+    options
+  );
+}
+
+// Attach this function to a button click event
+document.getElementById("start-btn").addEventListener("click", requestLocation);
+
   const pairs = location.search.slice(1).split('&').filter(Boolean);
   const grants = pairs.filter((pair) => nameOf(pair) === GRANT);
   if (grants.length !== 1 || !grants[0].includes('=')) return;
